@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.optimize import root
+import matplotlib.pyplot as plt
 
 class ZspreadZero(object):
     def __init__(self, zero_rates_perc, CF_perc, maturity=None):
@@ -14,8 +15,18 @@ class ZspreadZero(object):
     def calc_zspread_from_zero(self):
         zero_rates_regular = self.perc_to_regular(self._zero_rates_perc)
         CF_regular = self.perc_to_regular(self._CF_perc)
+        ## TO DO: add solver as an option
         sol = root(lambda x: self.total_CF_zspread(x, zero_rates_regular, CF_regular, self._maturity) - 1.0, [0.0] )
+        zspread = sol.x
+        assert zspread >= 0 and zspread <=1
         self._zspread_perc = self.regular_to_perc(sol.x)
+
+    def plot_zspread(self):
+        plt.plot(self._maturity, self._zero_rates_perc, label="Zero-Coupon Rates")
+        plt.plot(self._maturity, self._zspread_perc + self._zero_rates_perc, label="Bond Pricing Rates")
+        plt.xlabel("Maturity")
+        plt.ylabel(r"Rates(%)")
+        plt.legend()
     
     @staticmethod
     def perc_to_regular(percentage_values):
@@ -81,5 +92,7 @@ coupon_cf = np.array([4.0]*9 + [104.0])
 obj2 = ZspreadPar(par_rates, coupon_cf)
 obj2.calc_zspread_from_par()
 print(obj2._zspread_perc)
+obj2.plot_zspread()
+plt.show()
 
 
