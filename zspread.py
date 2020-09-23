@@ -53,6 +53,7 @@ class ZspreadPar(ZspreadZero):
             self._maturity = np.arange(self._par_rates_perc.size) + 1
         else:
             self._maturity = maturity
+        self._discount_factor = None
     
     def calc_zspread_from_par(self):
         price_regular = self.perc_to_regular(self._price_perc)
@@ -64,6 +65,7 @@ class ZspreadPar(ZspreadZero):
             df = (price_regular - par_rates_regular[i]*sum(discount_factor))/(face_value_regular + par_rates_regular[i])
             discount_factor.append(df)
         discount_factor = np.array(discount_factor)
+        self._discount_factor = discount_factor
         if self._compound == "discrete":
             zero_rates_regular = (1/discount_factor)**(1/self._maturity) - 1
         else:
