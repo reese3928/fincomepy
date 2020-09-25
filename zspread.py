@@ -2,7 +2,20 @@ import numpy as np
 from scipy.optimize import root
 import matplotlib.pyplot as plt
 
-class ZspreadZero(object):
+class FixedIncome(object):
+    def __init__(self):
+        return
+    
+    @staticmethod
+    def perc_to_regular(percentage_values):
+        return percentage_values*0.01
+
+    @staticmethod
+    def regular_to_perc(regular_values):
+        return regular_values*100
+    
+
+class ZspreadZero(FixedIncome):
     def __init__(self, zero_rates_perc, CF_perc, maturity=None):
         self._zero_rates_perc = zero_rates_perc
         self._CF_perc = CF_perc
@@ -28,13 +41,6 @@ class ZspreadZero(object):
         plt.ylabel(r"Rates(%)")
         plt.legend()
     
-    @staticmethod
-    def perc_to_regular(percentage_values):
-        return percentage_values*0.01
-
-    @staticmethod
-    def regular_to_perc(regular_values):
-        return regular_values*100
 
     @staticmethod
     def total_CF_zspread(zspread, zero_rates_regular, CF_regular, maturity):
