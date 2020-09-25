@@ -26,13 +26,13 @@ class ZspreadZero(FixedIncome):
         self._zspread_perc = None
     
     def calc_zspread_from_zero(self):
-        zero_rates_regular = self.perc_to_regular(self._zero_rates_perc)
-        CF_regular = self.perc_to_regular(self._CF_perc)
+        zero_rates_regular = FixedIncome.perc_to_regular(self._zero_rates_perc)
+        CF_regular = FixedIncome.perc_to_regular(self._CF_perc)
         ## TO DO: add solver as an option
         sol = root(lambda x: self.total_CF_zspread(x, zero_rates_regular, CF_regular, self._maturity) - 1.0, [0.0] )
         zspread = sol.x
         assert zspread >= 0 and zspread <=1
-        self._zspread_perc = self.regular_to_perc(sol.x)
+        self._zspread_perc = FixedIncome.regular_to_perc(sol.x)
 
     def plot_zspread(self):
         plt.plot(self._maturity, self._zero_rates_perc, label="Zero-Coupon Rates")
@@ -41,7 +41,6 @@ class ZspreadZero(FixedIncome):
         plt.ylabel(r"Rates(%)")
         plt.legend()
     
-
     @staticmethod
     def total_CF_zspread(zspread, zero_rates_regular, CF_regular, maturity):
         CF_each_period = CF_regular/(1 + zero_rates_regular + zspread)**maturity
@@ -62,9 +61,9 @@ class ZspreadPar(ZspreadZero):
         self._discount_factor = None
     
     def calc_zspread_from_par(self):
-        price_regular = self.perc_to_regular(self._price_perc)
-        face_value_regular = self.perc_to_regular(self._face_value_perc)
-        par_rates_regular = self.perc_to_regular(self._par_rates_perc)
+        price_regular = FixedIncome.perc_to_regular(self._price_perc)
+        face_value_regular = FixedIncome.perc_to_regular(self._face_value_perc)
+        par_rates_regular = FixedIncome.perc_to_regular(self._par_rates_perc)
         discount_factor = []
         discount_factor.append(face_value_regular/((face_value_regular) + par_rates_regular[0]))
         for i in range(1, par_rates_regular.size):
@@ -76,7 +75,7 @@ class ZspreadPar(ZspreadZero):
             zero_rates_regular = (1/discount_factor)**(1/self._maturity) - 1
         else:
             zero_rates_regular = -np.log(discount_factor)/self._maturity
-        self._zero_rates_perc = self.regular_to_perc(zero_rates_regular)  ## TO DO: remove this regular to percentage exchange
+        self._zero_rates_perc = FixedIncome.regular_to_perc(zero_rates_regular)  ## TO DO: remove this regular to percentage exchange
         self.calc_zspread_from_zero()
 
 
