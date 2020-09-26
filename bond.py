@@ -3,6 +3,7 @@ from dateutil.relativedelta import relativedelta
 import numpy as np
 import pandas as pd
 import math
+from scipy.optimize import root
 
 class FixedIncome(object):
     def __init__(self):
@@ -26,12 +27,30 @@ class Bond(FixedIncome):
         self._frequency = frequency
         self._basis = basis
         self._coupon_interval = 12 / frequency
-        self._nperiod = math.floor((self.diff_month(self._settlement, self._maturity))/self._coupon_interval)
-        self._coupon_dates = [self._maturity - relativedelta(months=self._coupon_interval)*i for i in range(self._nperiod + 1)]
-        self._couppcd = self._maturity - relativedelta(months=self._coupon_interval)*(self._nperiod + 1)
+        self._nperiod = math.ceil((self.diff_month(self._settlement, self._maturity))/self._coupon_interval)
+        self._coupon_dates = [self._maturity - relativedelta(months=self._coupon_interval)*i for i in range(self._nperiod)]
+        self._couppcd = self._maturity - relativedelta(months=self._coupon_interval)*(self._nperiod)
         self._coupncd = self._coupon_dates[-1]
         self._accrint = self.accrint(self._couppcd, self._coupncd, self._settlement, self._coupon_perc, 100, self._frequency, self._basis)
         self._dirty_price_perc = self._clean_price_perc + self._accrint
+
+    def price(self, yield_perc): ## to do change function name to dirty price
+        first_period = (self._coupncd - self._settlement).days / (self._coupncd - self._couppcd).days
+        periods = np.array([first_period + i for i in range(self._nperiod)])
+        CF_perc = np.array([self._coupon_perc / self._frequency] * self._nperiod)
+        CF_perc[-1] += 100  ## change this to par
+        CF_regular = FixedIncome.perc_to_regular(CF_perc)
+        yield_regular = FixedIncome.perc_to_regular(yield_perc)
+        DF = 1 / (1 + yield_regular / self._frequency) ** periods
+        CF_PV_total = sum(CF_regular * DF)
+        return FixedIncome.regular_to_perc(CF_PV_total)
+    
+    def get_yield(self):
+        dirty_price_regular = FixedIncome.perc_to_regular(self._dirty_price_perc)
+        print(dirty_price_regular)
+        sol = root(lambda x: FixedIncome.perc_to_regular(self.price(x)) - dirty_price_regular, [0.01] )
+        yield_perc = sol.x[0]
+        return yield_perc
 
     @staticmethod
     def accrint(issue, first_interest, settlement, rate, par=100, frequency=2, basis=1):
@@ -42,7 +61,6 @@ class Bond(FixedIncome):
         rate_regular = FixedIncome.perc_to_regular(rate)
         accrued_interest_perc = (rate_regular/frequency) * (accrued_days / total_days)
         return FixedIncome.regular_to_perc(accrued_interest_perc)
-
 
     @staticmethod
     def diff_month(date1, date2):
@@ -57,6 +75,8 @@ bond_test._couppcd
 bond_test._coupncd
 bond_test._accrint
 bond_test._dirty_price_perc
+bond_test.price(0.62334818)
+bond_test.get_yield()
 
 Bond.accrint(issue=bond_test._couppcd, first_interest=bond_test._coupncd, settlement=bond_test._settlement, 
              rate=0.625, par=100, frequency=2, basis=1)

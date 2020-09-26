@@ -29,7 +29,7 @@ class ZspreadZero(FixedIncome):
         zero_rates_regular = FixedIncome.perc_to_regular(self._zero_rates_perc)
         CF_regular = FixedIncome.perc_to_regular(self._CF_perc)
         ## TO DO: add solver as an option
-        sol = root(lambda x: self.total_CF_zspread(x, zero_rates_regular, CF_regular, self._maturity) - 1.0, [0.0] )
+        sol = root(lambda x: self.total_CF_zspread(x, zero_rates_regular, CF_regular, self._maturity) - 1.0, [0.01] )
         zspread = sol.x
         assert zspread >= 0 and zspread <=1
         self._zspread_perc = FixedIncome.regular_to_perc(sol.x)
