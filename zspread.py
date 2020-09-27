@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 class FixedIncome(object):
     def __init__(self):
-        return
+        pass
     
     @staticmethod
     def perc_to_regular(percentage_values):
