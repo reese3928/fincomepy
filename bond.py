@@ -17,6 +17,10 @@ class FixedIncome(object):
     def regular_to_perc(regular_values):
         return regular_values*100
 
+## TO DO: 
+# 1. change yield_regular -> yield
+# 2. make regular number as a dict, perc as another dict
+
 class Bond(FixedIncome):
     def __init__(self, settlement, maturity, coupon_perc, price_perc, frequency, basis=1):
         ## TO DO: split clean price into 32nd
@@ -36,21 +40,43 @@ class Bond(FixedIncome):
 
     def price(self, yield_perc): ## to do change function name to dirty price
         first_period = (self._coupncd - self._settlement).days / (self._coupncd - self._couppcd).days
-        periods = np.array([first_period + i for i in range(self._nperiod)])
+        self._periods = np.array([first_period + i for i in range(self._nperiod)])
         CF_perc = np.array([self._coupon_perc / self._frequency] * self._nperiod)
         CF_perc[-1] += 100  ## change this to par
-        CF_regular = FixedIncome.perc_to_regular(CF_perc)
+        self.CF_regular = FixedIncome.perc_to_regular(CF_perc)
         yield_regular = FixedIncome.perc_to_regular(yield_perc)
-        DF = 1 / (1 + yield_regular / self._frequency) ** periods
-        CF_PV_total = sum(CF_regular * DF)
+        self.DF = 1 / (1 + yield_regular / self._frequency) ** self._periods
+        self.CF_PV = self.CF_regular * self.DF
+        CF_PV_total = sum(self.CF_PV)
         return FixedIncome.regular_to_perc(CF_PV_total)
     
     def get_yield(self):
         dirty_price_regular = FixedIncome.perc_to_regular(self._dirty_price_perc)
-        print(dirty_price_regular)
         sol = root(lambda x: FixedIncome.perc_to_regular(self.price(x)) - dirty_price_regular, [0.01] )
         yield_perc = sol.x[0]
         return yield_perc
+    
+    def get_mac_duration(self):
+        self.CF_PV_times_p = self.CF_PV * self._periods
+        return self.CF_PV_times_p.sum() / FixedIncome.perc_to_regular(self._dirty_price_perc) / self._frequency
+
+    def get_mod_duration(self):
+        original_yield_perc = self.get_yield()
+        ## TO DO: make 0.01 as an argument
+        yield_up_perc = original_yield_perc + 0.01
+        yield_down_perc = original_yield_perc - 0.01
+        dirty_price_up_perc = self.price(yield_up_perc)
+        dirty_price_down_perc = self.price(yield_down_perc)
+        price_change_up_perc = dirty_price_up_perc - self._dirty_price_perc
+        price_change_down_perc = dirty_price_down_perc - self._dirty_price_perc
+        relative_change_up = price_change_up_perc / self._dirty_price_perc
+        relative_change_down = price_change_down_perc / self._dirty_price_perc
+        self._mod_duration = (abs(relative_change_up) + abs(relative_change_down)) / 2 / FixedIncome.perc_to_regular(0.01)
+        return self._mod_duration
+    
+    def get_DV01(self):
+        self._DV01 = self._mod_duration * FixedIncome.perc_to_regular(self._dirty_price_perc)
+        return self._DV01
 
     @staticmethod
     def accrint(issue, first_interest, settlement, rate, par=100, frequency=2, basis=1):
@@ -64,7 +90,6 @@ class Bond(FixedIncome):
 
     @staticmethod
     def diff_month(date1, date2):
-        print((date2.year - date1.year) * 12 + date2.month - date1.month)
         return (date2.year - date1.year) * 12 + date2.month - date1.month
 
 
@@ -77,6 +102,13 @@ bond_test._accrint
 bond_test._dirty_price_perc
 bond_test.price(0.62334818)
 bond_test.get_yield()
+bond_test.get_mac_duration()
+
+bond_test = Bond(settlement=date(2020,7,15), maturity=date(2025,6,30), coupon_perc=0.25, 
+                 price_perc=(99+26/32), frequency=2, basis=1)
+bond_test.get_yield()
+bond_test.get_mac_duration()
+bond_test.get_mod_duration()
 
 Bond.accrint(issue=bond_test._couppcd, first_interest=bond_test._coupncd, settlement=bond_test._settlement, 
              rate=0.625, par=100, frequency=2, basis=1)
