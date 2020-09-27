@@ -5,8 +5,6 @@ import sys
 sys.path.append(".")  ## TO DO: check if this is can be added to __init__.py
 from fixedincome import FixedIncome
 
-    
-
 class ZspreadZero(FixedIncome):
     def __init__(self, zero_rates_perc, CF_perc, maturity=None):
         self._zero_rates_perc = zero_rates_perc
@@ -69,29 +67,4 @@ class ZspreadPar(ZspreadZero):
             zero_rates_regular = -np.log(discount_factor)/self._maturity
         self._zero_rates_perc = FixedIncome.regular_to_perc(zero_rates_regular)  ## TO DO: remove this regular to percentage exchange
         self.calc_zspread_from_zero()
-
-
-
-    
-par_rates = np.array([1.00, 1.50, 1.80, 2.05, 2.20])
-zero_discrete = np.array([1.0, 1.5038, 1.8085, 2.0652, 2.2199])
-coupon_cf = np.array([3.0, 3.0, 3.0, 3.0, 103.0])
-
-obj = ZspreadZero(zero_discrete, coupon_cf)
-obj.calc_zspread_from_zero()
-print(obj._zspread_perc)
-
-
-obj = ZspreadPar(par_rates, coupon_cf)
-obj.calc_zspread_from_par()
-print(obj._zspread_perc)
-    
-par_rates = np.array([2.67, 2.80, 2.92, 3.03, 3.13, 3.22, 3.29, 3.35, 3.40, 3.44])
-coupon_cf = np.array([4.0]*9 + [104.0])
-obj2 = ZspreadPar(par_rates, coupon_cf)
-obj2.calc_zspread_from_par()
-print(obj2._zspread_perc)
-obj2.plot_zspread()
-plt.show()
-
 
