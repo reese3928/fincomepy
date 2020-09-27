@@ -1,18 +1,10 @@
 import numpy as np
 from scipy.optimize import root
 import matplotlib.pyplot as plt
+import sys
+sys.path.append(".")  ## TO DO: check if this is can be added to __init__.py
+from fixedincome import FixedIncome
 
-class FixedIncome(object):
-    def __init__(self):
-        pass
-    
-    @staticmethod
-    def perc_to_regular(percentage_values):
-        return percentage_values*0.01
-
-    @staticmethod
-    def regular_to_perc(regular_values):
-        return regular_values*100
     
 
 class ZspreadZero(FixedIncome):
