@@ -25,7 +25,6 @@ class ZspreadZero(FixedIncome):
     def calc_zspread_from_zero(self):
         ## TO DO: add solver as an option
         sol = root(lambda x: self.total_CF_zspread(x, self._reg_dict["zero_rates"], self._reg_dict["CF"], self._maturity) - 1.0, [0.01] )
-        print(type(sol.x))
         zspread = sol.x[0]
         assert zspread >= 0 and zspread <=1
         self._reg_dict["zspread"] = zspread
@@ -53,6 +52,7 @@ class ZspreadZero(FixedIncome):
 
 class ZspreadPar(ZspreadZero):
     def __init__(self, par_rates_perc, CF_perc, price_perc=100, face_value_perc=100, compound="discrete", maturity=None):
+        ## TO DO: check if price_perc is really useful
         FixedIncome.__init__(self)
         self._perc_dict["par_rates"] = par_rates_perc
         self._perc_dict["CF"] = CF_perc
@@ -66,11 +66,17 @@ class ZspreadPar(ZspreadZero):
         self._discount_factor = None
         self.update_dict()
     
+    @property
+    def zspread(self):
+        if "zspread" in self._perc_dict.keys():
+            return self._perc_dict["zspread"]
+        return self.calc_zspread_from_par()
+    
     def calc_zspread_from_par(self):
         discount_factor = []
         discount_factor.append(self._reg_dict["face_value"] / (self._reg_dict["face_value"] + self._reg_dict["par_rates"][0]))
         for i in range(1, self._reg_dict["par_rates"].size):
-            df = (self._reg_dict["price"] - self._reg_dict["par_rates"][i] * sum(discount_factor))/(self._reg_dict["face_value"] + self._reg_dict["par_rates"][i])
+            df = (self._reg_dict["price"] - self._reg_dict["par_rates"][i] * sum(discount_factor)) / (self._reg_dict["face_value"] + self._reg_dict["par_rates"][i])
             discount_factor.append(df)
         discount_factor = np.array(discount_factor)
         self._discount_factor = discount_factor
@@ -78,7 +84,7 @@ class ZspreadPar(ZspreadZero):
             self._reg_dict["zero_rates"] = (1/discount_factor)**(1/self._maturity) - 1
         else:
             self._reg_dict["zero_rates"] = -np.log(discount_factor)/self._maturity
-        self.update_dict()
         self.calc_zspread_from_zero()
+        return self._perc_dict["zspread"]
 
 
