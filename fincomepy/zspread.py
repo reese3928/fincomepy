@@ -6,10 +6,11 @@ sys.path.append(".")  ## TO DO: check if this is can be added to __init__.py
 from fixedincome import FixedIncome
 
 class ZspreadZero(FixedIncome):
-    def __init__(self, zero_rates_perc, CF_perc, maturity=None):
+    def __init__(self, zero_rates_perc, CF_perc, face_value_perc=100, maturity=None):
         super().__init__()
         self._perc_dict["zero_rates"] = zero_rates_perc
         self._perc_dict["CF"] = CF_perc
+        self._perc_dict["face_value"] = face_value_perc
         if maturity is None:
             self._maturity = np.arange(self._perc_dict["zero_rates"].size) + 1
         else:
@@ -24,7 +25,8 @@ class ZspreadZero(FixedIncome):
 
     def calc_zspread_from_zero(self):
         ## TO DO: add solver as an option
-        sol = root(lambda x: self.total_CF_zspread(x, self._reg_dict["zero_rates"], self._reg_dict["CF"], self._maturity) - 1.0, [0.01] )
+        sol = root(lambda x: self.total_CF_zspread(x, self._reg_dict["zero_rates"], self._reg_dict["CF"], 
+                   self._maturity) - self._reg_dict["face_value"], [0.01] )
         zspread = sol.x[0]
         assert zspread >= 0 and zspread <=1
         self._reg_dict["zspread"] = zspread
@@ -51,12 +53,10 @@ class ZspreadZero(FixedIncome):
 
 
 class ZspreadPar(ZspreadZero):
-    def __init__(self, par_rates_perc, CF_perc, price_perc=100, face_value_perc=100, compound="discrete", maturity=None):
-        ## TO DO: check if price_perc is really useful
+    def __init__(self, par_rates_perc, CF_perc, face_value_perc=100, compound="discrete", maturity=None):
         FixedIncome.__init__(self)
         self._perc_dict["par_rates"] = par_rates_perc
         self._perc_dict["CF"] = CF_perc
-        self._perc_dict["price"] = price_perc
         self._perc_dict["face_value"] = face_value_perc
         self._compound = compound
         if maturity is None:
@@ -76,7 +76,8 @@ class ZspreadPar(ZspreadZero):
         discount_factor = []
         discount_factor.append(self._reg_dict["face_value"] / (self._reg_dict["face_value"] + self._reg_dict["par_rates"][0]))
         for i in range(1, self._reg_dict["par_rates"].size):
-            df = (self._reg_dict["price"] - self._reg_dict["par_rates"][i] * sum(discount_factor)) / (self._reg_dict["face_value"] + self._reg_dict["par_rates"][i])
+            df = (self._reg_dict["face_value"] - self._reg_dict["par_rates"][i] * sum(discount_factor)) / \
+                 (self._reg_dict["face_value"] + self._reg_dict["par_rates"][i])
             discount_factor.append(df)
         discount_factor = np.array(discount_factor)
         self._discount_factor = discount_factor
