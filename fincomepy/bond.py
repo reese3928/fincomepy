@@ -18,8 +18,8 @@ class Bond(FixedIncome):
         super().__init__()
         self._settlement = settlement
         self._maturity = maturity
-        self._coupon_interval = 12 / frequency
-        self._nperiod = math.ceil((Bond.diff_month(self._settlement, self._maturity))/self._coupon_interval)
+        self._coupon_interval = 12 / frequency  ## TO DO: remove this line
+        self._nperiod = math.ceil((Bond.diff_month(self._settlement, self._maturity))/self._coupon_interval)  ## TO DO: remove this line
         self._perc_dict["coupon"] = coupon_perc
         self._perc_dict["clean_price"] = price_perc
         self._frequency = frequency
@@ -27,7 +27,7 @@ class Bond(FixedIncome):
         self._couppcd = Bond.couppcd(settlement, maturity, frequency, basis)
         self._coupncd = Bond.coupncd(settlement, maturity, frequency, basis)
         #self._coupon_dates = [self.last_day_in_month(item) for item in self._coupon_dates]
-        self._perc_dict["accrint"] = self.accrint(self._couppcd, self._coupncd, self._settlement, self._perc_dict["coupon"], 100, self._frequency, self._basis)
+        self._perc_dict["accrint"] = Bond.accrint(self._couppcd, self._coupncd, self._settlement, self._perc_dict["coupon"], 100, self._frequency, self._basis)
         self._perc_dict["dirty_price"] = self._perc_dict["clean_price"] + self._perc_dict["accrint"]
         self.update_dict()
     
@@ -48,11 +48,16 @@ class Bond(FixedIncome):
         if maturity==Bond.last_day_in_month(maturity):
             return Bond.last_day_in_month(ncd)
         return ncd
-
-
-
-    # coupon_dates = [maturity - relativedelta(months=coupon_interval)*i for i in range(nperiod)]  ## TO DO: add coupon_dates calculation
-
+    
+    @staticmethod
+    def accrint(issue, first_interest, settlement, rate, par=100, frequency=2, basis=1):
+        ## TO DO: change par=100
+        ## TO DO: check if first_interest > issue
+        total_days = (first_interest - issue).days
+        accrued_days = (settlement - issue).days
+        rate_regular = rate/100
+        accrued_interest_perc = (rate_regular/frequency) * (accrued_days / total_days)
+        return accrued_interest_perc*100
 
     def price(self, yield_perc): ## to do change function name to dirty price
         first_period = (self._coupncd - self._settlement).days / (self._coupncd - self._couppcd).days
@@ -103,16 +108,6 @@ class Bond(FixedIncome):
         all = (self.CF_PV_times_p + self.CF_PV_times_p_2) / self._reg_dict["dirty_price"]
         self._convexity = all.sum() / (4 * (1 + self._reg_dict["yield"] / self._frequency) ** 2)
         return self._convexity
-
-    @staticmethod
-    def accrint(issue, first_interest, settlement, rate, par=100, frequency=2, basis=1):
-        ## TO DO: change par=100
-        ## TO DO: check if first_interest > issue
-        total_days = (first_interest - issue).days
-        accrued_days = (settlement - issue).days
-        rate_regular = rate/100
-        accrued_interest_perc = (rate_regular/frequency) * (accrued_days / total_days)
-        return accrued_interest_perc*100
 
     @staticmethod
     def diff_month(date1, date2):

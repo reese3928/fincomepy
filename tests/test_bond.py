@@ -50,8 +50,11 @@ class Test(unittest.TestCase):
         # bond_test._couppcd
         # bond_test._coupncd
 
-    #def test_zspread_property(self):
-        
+    def test_couppcd(self):
+        pcd = Bond.couppcd(settlement=date(2020,7,15), maturity=date(2030,5,15), frequency=2, basis=1)
+        self.assertEqual(pcd, date(2020, 5, 15))
+        ncd = Bond.coupncd(settlement=date(2020,7,15), maturity=date(2030,5,15), frequency=2, basis=1)
+        self.assertEqual(ncd, date(2020, 11, 15))
 
 
 if __name__ == '__main__':
