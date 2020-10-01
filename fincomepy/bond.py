@@ -102,16 +102,7 @@ class Bond(FixedIncome):
         return next_month - timedelta(days=next_month.day)
 
 
-bond_test = Bond(settlement=date(2020,7,15), maturity=date(2030,5,15), coupon_perc=0.625, 
-                 price_perc=(100+0.5/32), frequency=2, basis=1)
-bond_test._coupon_interval
-bond_test._couppcd
-bond_test._coupncd
-bond_test._accrint
-bond_test._dirty_price_perc
-bond_test.price(0.62334818)
-bond_test.get_yield()
-bond_test.get_mac_duration()
+
 
 bond_test = Bond(settlement=date(2020,7,15), maturity=date(2025,6,30), coupon_perc=0.25, 
                  price_perc=(99+26/32), frequency=2, basis=1)
