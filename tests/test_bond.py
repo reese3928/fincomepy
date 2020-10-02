@@ -19,12 +19,12 @@ class Test(unittest.TestCase):
         self.assertTrue(abs(bond_test._perc_dict["accrint"] - 0.1036) < 0.0001)
         self.assertTrue(abs(bond_test._perc_dict["dirty_price"] - 100.1192) < 0.0001)
         self.assertTrue(abs(bond_test.price(0.62334818) - 100.1192) < 0.0001)
-        self.assertTrue(abs(bond_test.get_yield() - 0.6233) < 0.0001)
+        #self.assertTrue(abs(bond_test.get_yield() - 0.6233) < 0.0001)
         self.assertTrue(abs(bond_test.get_mac_duration() - 9.5437) < 0.0001)
 
         bond_test = Bond(settlement=date(2020,7,15), maturity=date(2025,6,30), coupon_perc=0.25, 
                  price_perc=(99+26/32), frequency=2, basis=1)
-        self.assertTrue(abs(bond_test.get_yield() - 0.2881) < 0.0001)
+        #self.assertTrue(abs(bond_test.get_yield() - 0.2881) < 0.0001)
         self.assertTrue(abs(bond_test._perc_dict["accrint"] - 0.0102 < 0.0001))
         self.assertTrue(abs(bond_test.get_mac_duration() - 4.9312 < 0.0001))
         self.assertTrue(abs(bond_test.get_mod_duration() - 4.9241 < 0.0001))
@@ -55,6 +55,23 @@ class Test(unittest.TestCase):
         self.assertEqual(pcd, date(2020, 5, 15))
         ncd = Bond.coupncd(settlement=date(2020,7,15), maturity=date(2030,5,15), frequency=2, basis=1)
         self.assertEqual(ncd, date(2020, 11, 15))
+        accrued_interest = Bond.accrint(issue=pcd, first_interest=ncd, settlement=date(2020,7,15),
+                                        rate=0.625, par=1, frequency=2, basis=1)
+        self.assertTrue(abs(accrued_interest - 0.1036) < 0.0001)
+        dirty_price = Bond.price2(settlement=date(2020,7,15), maturity=date(2030,5,15), rate=0.625,
+                                  yld=0.62334818, redemption=100, frequency=2, basis=1)
+        self.assertTrue(abs(dirty_price - 100.1192) < 0.0001)
+        yld = Bond.yld(settlement=date(2020,7,15), maturity=date(2030,5,15), rate=0.625,
+                                  pr=(100+0.5/32), redemption=100, frequency=2, basis=1)
+        self.assertTrue(abs(yld - 0.6233) < 0.0001)
+        yld = Bond.yld(settlement=date(2020,7,15), maturity=date(2030,5,15), rate=0.625,
+                                  pr=(100+0.5/32), redemption=105, frequency=2, basis=1)
+        self.assertTrue(abs(yld - 1.1060) < 0.0001)
+    
+    def test_invalid_input(self):
+        with self.assertRaises(Exception):
+            Bond.accrint(issue=date(2020, 11, 15), first_interest=date(2020, 5, 15), 
+                         settlement=date(2020,7,15), rate=0.625, par=1, frequency=2, basis=1)
 
 
 if __name__ == '__main__':

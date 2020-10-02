@@ -27,7 +27,8 @@ class Bond(FixedIncome):
         self._couppcd = Bond.couppcd(settlement, maturity, frequency, basis)
         self._coupncd = Bond.coupncd(settlement, maturity, frequency, basis)
         #self._coupon_dates = [self.last_day_in_month(item) for item in self._coupon_dates]
-        self._perc_dict["accrint"] = Bond.accrint(self._couppcd, self._coupncd, self._settlement, self._perc_dict["coupon"], 100, self._frequency, self._basis)
+        self._perc_dict["accrint"] = Bond.accrint(issue=self._couppcd, first_interest=self._coupncd, settlement=self._settlement,
+                                                  rate=self._perc_dict["coupon"], par=1, frequency=self._frequency, basis=self._basis)
         self._perc_dict["dirty_price"] = self._perc_dict["clean_price"] + self._perc_dict["accrint"]
         self.update_dict()
     
@@ -50,14 +51,41 @@ class Bond(FixedIncome):
         return ncd
     
     @staticmethod
-    def accrint(issue, first_interest, settlement, rate, par=100, frequency=2, basis=1):
-        ## TO DO: change par=100
-        ## TO DO: check if first_interest > issue
+    def accrint(issue, first_interest, settlement, rate, par=1, frequency=2, basis=1):
+        if issue > first_interest:
+            raise Exception('issue date cannot be later than first interest date.')
         total_days = (first_interest - issue).days
         accrued_days = (settlement - issue).days
-        rate_regular = rate/100
-        accrued_interest_perc = (rate_regular/frequency) * (accrued_days / total_days)
-        return accrued_interest_perc*100
+        accrued_interest = (rate / frequency) * (accrued_days / total_days)
+        return accrued_interest * par
+
+    @staticmethod
+    def price2(settlement, maturity, rate, yld, redemption, frequency, basis):
+        pcd = Bond.couppcd(settlement, maturity, frequency, basis)
+        ncd = Bond.coupncd(settlement, maturity, frequency, basis)
+        first_period = (ncd - settlement).days / (ncd - pcd).days
+        coupon_interval = 12 / frequency  
+        nperiod = math.ceil((Bond.diff_month(settlement, maturity)) / coupon_interval)  
+        periods = np.array([first_period + i for i in range(nperiod)])
+        CF_perc = np.array([rate / frequency] * nperiod)
+        CF_perc[-1] += redemption 
+        CF_regular = CF_perc * 0.01
+        yld_regular = yld * 0.01
+        DF = 1 / (1 + yld_regular / frequency) ** periods
+        CF_PV = CF_regular * DF
+        CF_PV_total = sum(CF_PV)
+        return CF_PV_total * 100  
+
+    @staticmethod
+    def yld(settlement, maturity, rate, pr, redemption, frequency, basis):
+        pcd = Bond.couppcd(settlement, maturity, frequency, basis)
+        ncd = Bond.coupncd(settlement, maturity, frequency, basis)
+        accrued_interest = Bond.accrint(issue=pcd, first_interest=ncd, settlement=settlement, rate=rate, par=1, frequency=frequency, basis=basis)
+        dirty_price_target = accrued_interest + pr
+        sol = root(lambda x: Bond.price2(settlement, maturity, rate, x, redemption, frequency, basis) - dirty_price_target, [0.01] )
+        yld = sol.x[0]
+        assert yld >= 0 and yld <= 100
+        return yld
 
     def price(self, yield_perc): ## to do change function name to dirty price
         first_period = (self._coupncd - self._settlement).days / (self._coupncd - self._couppcd).days
@@ -74,19 +102,13 @@ class Bond(FixedIncome):
         CF_PV_total = sum(self.CF_PV)
         return CF_PV_total*100  ## TO DO: change this
     
-    def get_yield(self):
-        sol = root(lambda x: self.price(x)/100 - self._reg_dict["dirty_price"], [0.01] )
-        yield_perc = sol.x[0]
-        self._perc_dict["yield"] = yield_perc
-        self.update_dict()
-        return yield_perc
-    
     def get_mac_duration(self):
         self.CF_PV_times_p = self.CF_PV * self._periods
         return self.CF_PV_times_p.sum() / self._reg_dict["dirty_price"] / self._frequency
 
     def get_mod_duration(self):
-        original_yield_perc = self.get_yield()
+        original_yield_perc = Bond.yld(settlement=self._settlement, maturity=self._maturity, 
+            rate=self._perc_dict["coupon"], pr=self._perc_dict["clean_price"], redemption=100, frequency=2, basis=1)
         ## TO DO: make 0.01 as an argument
         yield_up_perc = original_yield_perc + 0.01
         yield_down_perc = original_yield_perc - 0.01
