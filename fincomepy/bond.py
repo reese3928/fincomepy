@@ -7,17 +7,13 @@ import sys
 sys.path.append(".")  ## TO DO: check if this is can be added to __init__.py
 from fixedincome import FixedIncome
 
-## TO DO: 
-# 3. add convexity adjustment (approximate bond price change using DV01 and convexity)
-
 class Bond(FixedIncome):
     def __init__(self, settlement, maturity, coupon_perc, price_perc, frequency, basis=1, redemption=100, yld=None):
-        ## TO DO: split clean price into 32nd
         super().__init__()
         self._settlement = settlement
         self._maturity = maturity
         self._perc_dict["coupon"] = coupon_perc
-        self._perc_dict["clean_price"] = price_perc
+        self._perc_dict["clean_price"] = self.parse_price(price_perc)
         self._frequency = frequency
         self._basis = basis
         self._redemption = redemption
@@ -147,7 +143,14 @@ class Bond(FixedIncome):
         yield_regular = self._yld * 0.01
         self._convexity = all.sum() / (4 * (1 + yield_regular / self._frequency) ** 2)
         return self._convexity
-
+    
+    def price_change(self, yld_change_perc):
+        DV01 = self.DV01()
+        convexity = self.convexity()
+        yld_change_reg = yld_change_perc * 0.01
+        price_change_reg = - DV01 * yld_change_reg + self._reg_dict["dirty_price"] * convexity / 2 * (yld_change_reg ** 2)
+        return price_change_reg * 100
+            
     @staticmethod
     def diff_month(date1, date2):
         return (date2.year - date1.year) * 12 + date2.month - date1.month
@@ -157,6 +160,21 @@ class Bond(FixedIncome):
         next_month = original_date.replace(day=28) + timedelta(days=4)
         return next_month - timedelta(days=next_month.day)
 
-
+    @staticmethod
+    def parse_price(pr):
+        if not isinstance(pr, (int, float, str)):
+            raise Exception('price should be int, float, or str.')
+        if isinstance(pr, (int, float)):
+            return pr
+        quotelist = pr.split('-')
+        assert len(quotelist) <= 2
+        quotelist = [item.strip() for item in quotelist]
+        if len(quotelist) == 1:
+            return int(quotelist[0])
+        firstnum = quotelist[0]
+        secondnum = quotelist[1]
+        if secondnum.endswith('+'):
+            return int(firstnum) + (int(secondnum[:-1]) + 0.5) / 32
+        return int(firstnum) + int(secondnum) / 32
 
 

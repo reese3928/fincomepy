@@ -31,6 +31,8 @@ class Test(unittest.TestCase):
         self.assertTrue(abs(bond_test.mac_duration() - 9.5437) < 0.0001)
         self.assertFalse(bond_test._mac_duration is None)
         self.assertFalse(bond_test._yld is None)
+        # test price_change
+        self.assertTrue(abs(bond_test.price_change(yld_change_perc=0.1) - (-0.9477)) < 0.0001)
 
         bond_test = Bond(settlement=date(2020,7,15), maturity=date(2025,6,30), coupon_perc=0.25, 
                  price_perc=(99+26/32), frequency=2, basis=1)
@@ -77,10 +79,30 @@ class Test(unittest.TestCase):
                                         rate=0.625, par=1, frequency=2, basis=1)
         self.assertTrue(abs(accrued_interest - 0.1036) < 0.0001)
     
+    def test_parse_price(self):
+        bond_test1 = Bond(settlement=date(2020,7,15), maturity=date(2030,5,15), coupon_perc=0.625, 
+                 price_perc=(100+0.5/32), frequency=2, basis=1)
+        bond_test2 = Bond(settlement=date(2020,7,15), maturity=date(2030,5,15), coupon_perc=0.625, 
+                 price_perc="100-00+", frequency=2, basis=1)
+        self.assertEqual(bond_test1._perc_dict["clean_price"], bond_test2._perc_dict["clean_price"])
+        bond_test1 = Bond(settlement=date(2020,7,15), maturity=date(2030,5,15), coupon_perc=0.625, 
+                 price_perc=100, frequency=2, basis=1)
+        bond_test2 = Bond(settlement=date(2020,7,15), maturity=date(2030,5,15), coupon_perc=0.625, 
+                 price_perc="100", frequency=2, basis=1)
+        self.assertEqual(bond_test1._perc_dict["clean_price"], bond_test2._perc_dict["clean_price"])
+        bond_test1 = Bond(settlement=date(2020,7,15), maturity=date(2030,5,15), coupon_perc=0.625, 
+                 price_perc=(99+26/32), frequency=2, basis=1)
+        bond_test2 = Bond(settlement=date(2020,7,15), maturity=date(2030,5,15), coupon_perc=0.625, 
+                 price_perc="99-26", frequency=2, basis=1)
+        self.assertEqual(bond_test1._perc_dict["clean_price"], bond_test2._perc_dict["clean_price"])
+
     def test_invalid_input(self):
         with self.assertRaises(Exception):
             Bond.accrint(issue=date(2020, 11, 15), first_interest=date(2020, 5, 15), 
                          settlement=date(2020,7,15), rate=0.625, par=1, frequency=2, basis=1)
+        with self.assertRaises(Exception):
+            Bond(settlement=date(2020,7,15), maturity=date(2030,5,15), coupon_perc=0.625, 
+                 price_perc=[100+0.5/32], frequency=2, basis=1)
 
 
 if __name__ == '__main__':
