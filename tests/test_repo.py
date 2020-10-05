@@ -31,11 +31,11 @@ class Test(unittest.TestCase):
 
         repo_test = Repo(settlement=date(2020,7,17), maturity=date(2028,10,22), coupon_perc= (1 + 5/8), 
             price_perc=113.321, frequency=2, basis=1, 
-            bond_face_value=100000000, repo_period=276, repo_rate_perc=0.575)
+            bond_face_value=100000000, repo_period=276, repo_rate_perc=0.575, type='UK')
         self.assertTrue(abs(repo_test.start_payment() - 113702830.60) < 0.01)
-        self.assertTrue(abs(repo_test.end_payment(type='UK') - 113382413.14) < 0.01)
+        self.assertTrue(abs(repo_test.end_payment() - 113382413.14) < 0.01)
         
-        
+
 if __name__ == '__main__':
     unittest.main()
 
