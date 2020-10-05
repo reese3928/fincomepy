@@ -100,6 +100,8 @@ class Bond(FixedIncome):
         return (periods, CF_regular, DF)
     
     def mac_duration(self):
+        if self._mac_duration is not None:
+            return self._mac_duration
         periods, CF_regular, DF = self.intermediate_values()
         CF_PV = CF_regular * DF
         CF_PV_times_p = CF_PV * periods
@@ -107,6 +109,8 @@ class Bond(FixedIncome):
         return self._mac_duration
 
     def mod_duration(self, yld_change_perc=0.01):
+        if self._mod_duration is not None:
+            return self._mod_duration
         if self._yld is None:
             original_yield_perc = self.yld(self._settlement, self._maturity, self._perc_dict["coupon"], self._perc_dict["clean_price"],
                                            self._redemption, self._frequency, self._basis)
@@ -126,12 +130,16 @@ class Bond(FixedIncome):
         return self._mod_duration
     
     def DV01(self):
+        if self._DV01 is not None:
+            return self._DV01
         if self._mod_duration is None:
             self.mod_duration()
         self._DV01 = self._mod_duration * self._reg_dict["dirty_price"]
         return self._DV01
     
     def convexity(self):
+        if self._convexity is not None:
+            return self._convexity
         periods, CF_regular, DF = self.intermediate_values()
         CF_PV = CF_regular * DF
         CF_PV_times_p = CF_PV * periods
@@ -176,5 +184,13 @@ class Bond(FixedIncome):
         if secondnum.endswith('+'):
             return int(firstnum) + (int(secondnum[:-1]) + 0.5) / 32
         return int(firstnum) + int(secondnum) / 32
+
+    def coupon_dates(self):
+        coupon_interval = 12 / self._frequency
+        periods = math.floor((self.diff_month(self._settlement, self._maturity)) / coupon_interval)
+        coupon_dates = [self._maturity - relativedelta(months=coupon_interval) * i for i in range(periods + 1)]
+        if self._maturity==Bond.last_day_in_month(self._maturity):
+            coupon_dates = [Bond.last_day_in_month(item) for item in coupon_dates]
+        return coupon_dates
 
 
