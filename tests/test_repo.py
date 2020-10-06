@@ -34,7 +34,17 @@ class Test(unittest.TestCase):
             bond_face_value=100000000, repo_period=276, repo_rate_perc=0.575, type='UK')
         self.assertTrue(abs(repo_test.start_payment() - 113702830.60) < 0.01)
         self.assertTrue(abs(repo_test.end_payment() - 113382413.14) < 0.01)
-        
+    
+    def test_from_end_date(self):
+        repo_test = Repo(settlement=date(2020,7,17), maturity=date(2028,10,22), coupon_perc= (1 + 5/8), 
+            price_perc=113.321, frequency=2, basis=1, 
+            bond_face_value=100000000, repo_period=276, repo_rate_perc=0.575, type='UK')
+        repo_test2 = Repo.from_end_date(settlement=date(2020,7,17), maturity=date(2028,10,22), coupon_perc= (1 + 5/8), 
+            price_perc=113.321, frequency=2, basis=1, 
+            bond_face_value=100000000, repo_end_date=date(2021, 4, 19), repo_rate_perc=0.575, type='UK')
+        self.assertEqual(repo_test._perc_dict["accrint"], repo_test2._perc_dict["accrint"])
+        self.assertEqual(repo_test.start_payment(), repo_test2.start_payment())
+        self.assertEqual(repo_test.end_payment(), repo_test2.end_payment())
 
 if __name__ == '__main__':
     unittest.main()

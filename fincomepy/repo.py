@@ -9,7 +9,6 @@ from fixedincome import FixedIncome
 from bond import Bond
 
 class Repo(Bond):
-    ## TO DO: add a constructor with repo start date and repo end date input
     ## TO DO: add repo constructor without bond information
     def __init__(self, settlement, maturity, coupon_perc, price_perc, frequency, basis, 
                  bond_face_value, repo_period, repo_rate_perc, type='US'):
@@ -19,18 +18,24 @@ class Repo(Bond):
         self._perc_dict["repo_rate"] = repo_rate_perc
         self._face_value = bond_face_value
         self._repo_end_date = self._settlement + timedelta(days=repo_period)
-        self._type = type
+        self._type = type   ## TO DO: figure out a way to change this type argument
         self.update_dict()
         self._start_payment = None
         self._end_payment = None
     
+    @classmethod
+    def from_end_date(cls, settlement, maturity, coupon_perc, price_perc, frequency, basis, 
+        bond_face_value, repo_end_date, repo_rate_perc, type='US'):
+        repo_period = (repo_end_date - settlement).days
+        return cls(settlement, maturity, coupon_perc, price_perc, frequency, basis, bond_face_value, repo_period, repo_rate_perc, type)
+        
     def start_payment(self):
         if self._start_payment is not None:
             return self._start_payment
         self._start_payment = self._face_value * self._reg_dict["dirty_price"]
         return self._start_payment
     
-    def end_payment(self): ## TO DO: figure out a way to change this type argument
+    def end_payment(self): 
         if self._type == 'US':
             days_in_year = 360
         else:
