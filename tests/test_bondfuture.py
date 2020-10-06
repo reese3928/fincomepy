@@ -17,6 +17,9 @@ class Test(unittest.TestCase):
         self.assertTrue(abs(bf_test._perc_dict["accrint"] - 0.4066) < 0.0001)
         self.assertTrue(abs(bf_test._perc_dict["repo_rate"] - 0.14) < 1e-6)
         self.assertTrue(abs(bf_test.forward_price() - 113.455) < 0.001)
+        self.assertTrue(abs(bf_test.full_future_val() - 113.444575) < 1e-6)
+        self.assertTrue(abs(bf_test.net_basis() - 0.343) < 0.001)
+        self.assertTrue(abs(bf_test.implied_repo_rate() - 0.09463) < 1e-5)
         
     
 

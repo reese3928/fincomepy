@@ -20,6 +20,7 @@ class BondFuture(Bond):
         self._type = type   
         self.update_dict()
         self._forward_pr_perc = None
+        self._future_val_perc = None
     
     #@classmethod
     #def from_end_date(cls, settlement, maturity, coupon_perc, price_perc, frequency, basis, 
@@ -37,5 +38,26 @@ class BondFuture(Bond):
         forward_pr_reg = self._reg_dict["dirty_price"] *  (1 + self._reg_dict["repo_rate"] * self._repo_period / days_in_year)
         self._forward_pr_perc = forward_pr_reg * 100
         return self._forward_pr_perc
+    
+    def full_future_val(self):
+        if self._future_val_perc is not None:
+            return self._future_val_perc
+        invoice_pr_perc = self._perc_dict["futures_pr_perc"] * self._conversion_factor
+        accrint_perc = Bond.accrint(self._couppcd, self._coupncd, self._repo_end_date, 
+                        self._perc_dict["coupon"], par=1, frequency=2, basis=1)
+        self._future_val_perc = invoice_pr_perc + accrint_perc
+        return self._future_val_perc
+
+    def net_basis(self):
+        return (self.forward_price() - self.full_future_val()) * 32
+    
+    def implied_repo_rate(self): 
+        if self._type == 'US':
+            days_in_year = 360
+        else:
+            days_in_year = 365
+        implied_repo_reg = (self.full_future_val() / self._perc_dict["dirty_price"] - 1) * days_in_year / self._repo_period
+        return implied_repo_reg * 100
+
     
  
