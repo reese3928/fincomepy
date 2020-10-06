@@ -7,3 +7,4 @@ __version__ = '0.1.0'
 from .zspread import ZspreadZero, ZspreadPar
 from .bond import Bond
 from .repo import Repo
+from .bondfuture import BondFuture
