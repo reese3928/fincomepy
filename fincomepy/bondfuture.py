@@ -3,6 +3,7 @@ from dateutil.relativedelta import relativedelta
 import numpy as np
 import math
 import sys
+import bisect
 sys.path.append(".")  ## TO DO: check if this is can be added to __init__.py
 from fixedincome import FixedIncome
 from bond import Bond
@@ -22,11 +23,12 @@ class BondFuture(Bond):
         self._forward_pr_perc = None
         self._future_val_perc = None
     
-    #@classmethod
-    #def from_end_date(cls, settlement, maturity, coupon_perc, price_perc, frequency, basis, 
-    #    bond_face_value, repo_end_date, repo_rate_perc, type='US'):
-    #    repo_period = (repo_end_date - settlement).days
-    #    return cls(settlement, maturity, coupon_perc, price_perc, frequency, basis, bond_face_value, repo_period, repo_rate_perc, type)
+    @classmethod
+    def from_end_date(cls, settlement, maturity, coupon_perc, price_perc, frequency, basis, 
+        repo_end_date, repo_rate_perc, futures_pr_perc, conversion_factor, type='US'):
+        repo_period = (repo_end_date - settlement).days
+        return cls(settlement, maturity, coupon_perc, price_perc, frequency, basis, 
+            repo_period, repo_rate_perc, futures_pr_perc, conversion_factor, type)
     
     def forward_price(self): 
         if self._type == 'US':
@@ -42,10 +44,29 @@ class BondFuture(Bond):
     def full_future_val(self):
         if self._future_val_perc is not None:
             return self._future_val_perc
+        if self._type == 'US':
+            days_in_year = 360
+        else:
+            days_in_year = 365
         invoice_pr_perc = self._perc_dict["futures_pr_perc"] * self._conversion_factor
-        accrint_perc = Bond.accrint(self._couppcd, self._coupncd, self._repo_end_date, 
-                        self._perc_dict["coupon"], par=1, frequency=2, basis=1)
-        self._future_val_perc = invoice_pr_perc + accrint_perc
+        temp = list(self.coupon_dates())
+        temp.reverse()
+        ind = bisect.bisect_left(temp, self._repo_end_date)
+        coupon_dates = temp[:ind]
+        coupon_FV = 0.0 
+        if len(coupon_dates) == 0:
+            accrint_perc = Bond.accrint(self._couppcd, self._coupncd, self._repo_end_date, 
+                self._perc_dict["coupon"], par=1, frequency=2, basis=1)
+        else:
+            for item in coupon_dates:
+                reinvestment_days = (self._repo_end_date - item).days
+                coupon_FV_one_period_reg = self._reg_dict["coupon"] / self._frequency * \
+                    (1 + self._reg_dict["repo_rate"] * reinvestment_days / days_in_year)
+                coupon_FV += coupon_FV_one_period_reg * 100
+            ncd = Bond.coupncd(self._repo_end_date, self._maturity, self._frequency, self._basis)
+            accrint_perc = Bond.accrint(coupon_dates[-1], ncd, self._repo_end_date, self._perc_dict["coupon"], 
+                1, self._frequency, self._basis)
+        self._future_val_perc = invoice_pr_perc + accrint_perc + coupon_FV
         return self._future_val_perc
 
     def net_basis(self):
