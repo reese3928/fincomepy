@@ -1,7 +1,5 @@
 import unittest
 from datetime import date, timedelta
-import sys
-sys.path.append("fincomepy")  ## TO DO: change this
 from fincomepy import BondFuture
 
 class Test(unittest.TestCase):

@@ -1,7 +1,5 @@
 import unittest
 import numpy as np
-import sys
-sys.path.append("fincomepy")  ## TO DO: change this
 from fincomepy import CDS
 
 class Test(unittest.TestCase):
