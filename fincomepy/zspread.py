@@ -2,8 +2,7 @@ import numpy as np
 from scipy.optimize import root
 import matplotlib.pyplot as plt
 import sys
-sys.path.append(".")  ## TO DO: check if this is can be added to __init__.py
-from fixedincome import FixedIncome
+from fincomepy.fixedincome import FixedIncome
 
 class ZspreadZero(FixedIncome):
     def __init__(self, zero_rates_perc, CF_perc, face_value_perc=100, maturity=None):

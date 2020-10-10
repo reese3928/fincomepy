@@ -4,8 +4,7 @@ import numpy as np
 import math
 from scipy.optimize import root
 import sys
-sys.path.append(".")  ## TO DO: check if this is can be added to __init__.py
-from fixedincome import FixedIncome
+from fincomepy.fixedincome import FixedIncome
 
 class Bond(FixedIncome):
     def __init__(self, settlement, maturity, coupon_perc, price_perc, frequency, basis=1, redemption=100, yld=None):

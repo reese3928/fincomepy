@@ -1,7 +1,6 @@
 import numpy as np
 import sys
-sys.path.append(".")  ## TO DO: check if this is can be added to __init__.py
-from fixedincome import FixedIncome
+from fincomepy.fixedincome import FixedIncome
 
 class CDS(FixedIncome):
     def __init__(self, risk_free_perc, risky_perc, face_value_perc=100, rr_perc=50, maturity=None):

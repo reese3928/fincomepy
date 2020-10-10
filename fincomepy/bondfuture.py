@@ -2,9 +2,8 @@ from datetime import date, timedelta
 import numpy as np
 import sys
 import bisect
-sys.path.append(".")  ## TO DO: check if this is can be added to __init__.py
-from fixedincome import FixedIncome
-from bond import Bond
+from fincomepy.fixedincome import FixedIncome
+from fincomepy.bond import Bond
 
 class BondFuture(Bond):
     def __init__(self, settlement, maturity, coupon_perc, price_perc, frequency, basis, 
