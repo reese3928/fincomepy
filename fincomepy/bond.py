@@ -49,10 +49,37 @@ class Bond(FixedIncome):
     def accrint(issue, first_interest, settlement, rate, par=1, frequency=2, basis=1):
         if issue > first_interest:
             raise Exception('issue date cannot be later than first interest date.')
-        total_days = (first_interest - issue).days
-        accrued_days = (settlement - issue).days
+        if basis == 2:
+            return (settlement - issue).days / 360 * rate
+        if basis == 3:
+            return (settlement - issue).days / 365 * rate
+        total_days = Bond.day_count(issue, first_interest, basis)
+        accrued_days = Bond.day_count(issue, settlement, basis)
         accrued_interest = (rate / frequency) * (accrued_days / total_days)
         return accrued_interest * par
+    
+    @staticmethod
+    def day_count(date1, date2, basis):
+        if basis == 0:
+            Y1, M1, D1 = date1.year, date1.month, date1.day
+            Y2, M2, D2 = date2.year, date2.month, date2.day
+            if date1 == Bond.last_day_in_month(date1) and date2 == Bond.last_day_in_month(date2) \
+                and date1.month == 2 and date2.month == 2:
+                D2 = 30
+            if date1 == Bond.last_day_in_month(date1) and date1.month == 2:
+                D1 = 30
+            if D2 == 31 and (D1 == 30 or D1 == 31):
+                D2 = 30
+            if D1 == 31:
+                D1 = 30
+            return 360 * (Y2 - Y1) + 30 * (M2 - M1) + (D2 - D1)
+        if basis == 4:
+            if date1.day == 31:
+                date1 = date1 - relativedelta(days=1)
+            if date2.day == 31:
+                date2 = date2 - relativedelta(days=1)
+            return 360 * (date2.year - date1.year) + 30 * (date2.month - date1.month) + (date2.day - date1.day)
+        return (date2 - date1).days
 
     @staticmethod
     def dirty_price(settlement, maturity, rate, yld, redemption, frequency, basis):

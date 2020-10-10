@@ -97,7 +97,71 @@ class Test(unittest.TestCase):
         with self.assertRaises(Exception):
             Bond(settlement=date(2020,7,15), maturity=date(2030,5,15), coupon_perc=0.625, 
                  price_perc=[100+0.5/32], frequency=2, basis=1)
+    
+    def test_day_count(self):
+        settlement = date(2020,7,15)
+        maturity = date(2025, 3, 20)
+        coupon = 0.25
+        pcd = Bond.couppcd(settlement=settlement, maturity=maturity, frequency=2, basis=1)
+        ncd = Bond.coupncd(settlement=settlement, maturity=maturity, frequency=2, basis=1)
+        value1 = Bond.accrint(pcd, ncd, settlement, coupon, par=1, frequency=2, basis=1)
+        self.assertTrue(abs(value1 - 0.07948 < 1e-5))
+        value0 = Bond.accrint(pcd, ncd, settlement, coupon, par=1, frequency=2, basis=0)
+        self.assertTrue(abs(value0 - 0.07986 < 1e-5))
+        value2 = Bond.accrint(pcd, ncd, settlement, coupon, par=1, frequency=2, basis=2)
+        self.assertTrue(abs(value2 - 0.08125 < 1e-5))
+        value3 = Bond.accrint(pcd, ncd, settlement, coupon, par=1, frequency=2, basis=3)
+        self.assertTrue(abs(value3 - 0.08014 < 1e-5))
+        value4 = Bond.accrint(pcd, ncd, settlement, coupon, par=1, frequency=2, basis=4)
+        self.assertTrue(abs(value4 - 0.07986 < 1e-5))
 
+        settlement = date(2020,7,15)
+        maturity = date(2025, 3, 31)
+        coupon = 0.25
+        pcd = Bond.couppcd(settlement=settlement, maturity=maturity, frequency=2, basis=1)
+        ncd = Bond.coupncd(settlement=settlement, maturity=maturity, frequency=2, basis=1)
+        value1 = Bond.accrint(pcd, ncd, settlement, coupon, par=1, frequency=2, basis=1)
+        self.assertTrue(abs(value1 - 0.07240 < 1e-5))
+        value0 = Bond.accrint(pcd, ncd, settlement, coupon, par=1, frequency=2, basis=0)
+        self.assertTrue(abs(value0 - 0.07292 < 1e-5))
+        value2 = Bond.accrint(pcd, ncd, settlement, coupon, par=1, frequency=2, basis=2)
+        self.assertTrue(abs(value2 - 0.07361 < 1e-5))
+        value3 = Bond.accrint(pcd, ncd, settlement, coupon, par=1, frequency=2, basis=3)
+        self.assertTrue(abs(value3 - 0.07260 < 1e-5))
+        value4 = Bond.accrint(pcd, ncd, settlement, coupon, par=1, frequency=2, basis=4)
+        self.assertTrue(abs(value4 - 0.07292 < 1e-5))
+
+        settlement = date(2020,7,15)
+        maturity = date(2025, 6, 30)
+        coupon = 0.25
+        pcd = Bond.couppcd(settlement=settlement, maturity=maturity, frequency=2, basis=1)
+        ncd = Bond.coupncd(settlement=settlement, maturity=maturity, frequency=2, basis=1)
+        value1 = Bond.accrint(pcd, ncd, settlement, coupon, par=1, frequency=2, basis=1)
+        self.assertTrue(abs(value1 - 0.01019 < 1e-5))
+        value0 = Bond.accrint(pcd, ncd, settlement, coupon, par=1, frequency=2, basis=0)
+        self.assertTrue(abs(value0 - 0.01042 < 1e-5))
+        value2 = Bond.accrint(pcd, ncd, settlement, coupon, par=1, frequency=2, basis=2)
+        self.assertTrue(abs(value2 - 0.01042 < 1e-5))
+        value3 = Bond.accrint(pcd, ncd, settlement, coupon, par=1, frequency=2, basis=3)
+        self.assertTrue(abs(value3 - 0.01027 < 1e-5))
+        value4 = Bond.accrint(pcd, ncd, settlement, coupon, par=1, frequency=2, basis=4)
+        self.assertTrue(abs(value4 - 0.01042 < 1e-5))
+
+        settlement = date(2020,7,15)
+        maturity = date(2028, 2, 29)
+        coupon = 0.25
+        pcd = Bond.couppcd(settlement=settlement, maturity=maturity, frequency=2, basis=1)
+        ncd = Bond.coupncd(settlement=settlement, maturity=maturity, frequency=2, basis=1)
+        value1 = Bond.accrint(pcd, ncd, settlement, coupon, par=1, frequency=2, basis=1)
+        self.assertTrue(abs(value1 - 0.09307< 1e-5))
+        value0 = Bond.accrint(pcd, ncd, settlement, coupon, par=1, frequency=2, basis=0)
+        self.assertTrue(abs(value0 - 0.09375 < 1e-5))
+        value2 = Bond.accrint(pcd, ncd, settlement, coupon, par=1, frequency=2, basis=2)
+        self.assertTrue(abs(value2 - 0.09514 < 1e-5))
+        value3 = Bond.accrint(pcd, ncd, settlement, coupon, par=1, frequency=2, basis=3)
+        self.assertTrue(abs(value3 - 0.09384 < 1e-5))
+        value4 = Bond.accrint(pcd, ncd, settlement, coupon, par=1, frequency=2, basis=4)
+        self.assertTrue(abs(value4 - 0.09444 < 1e-5))
 
 if __name__ == '__main__':
     unittest.main()
