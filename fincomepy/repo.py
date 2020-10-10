@@ -2,7 +2,6 @@ from datetime import date, timedelta
 import numpy as np
 import sys
 from scipy.optimize import root
-#sys.path.append(".")  ## TO DO: check if this is can be added to __init__.py
 from fincomepy.fixedincome import FixedIncome
 from fincomepy.bond import Bond
 

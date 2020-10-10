@@ -1,6 +1,5 @@
 from datetime import date, timedelta
 import numpy as np
-import sys
 import bisect
 from fincomepy.fixedincome import FixedIncome
 from fincomepy.bond import Bond

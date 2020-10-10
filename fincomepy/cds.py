@@ -1,5 +1,4 @@
 import numpy as np
-import sys
 from fincomepy.fixedincome import FixedIncome
 
 class CDS(FixedIncome):

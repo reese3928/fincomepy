@@ -1,7 +1,6 @@
 import numpy as np
 from scipy.optimize import root
 import matplotlib.pyplot as plt
-import sys
 from fincomepy.fixedincome import FixedIncome
 
 class ZspreadZero(FixedIncome):

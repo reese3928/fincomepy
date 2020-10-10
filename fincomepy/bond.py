@@ -3,7 +3,6 @@ from dateutil.relativedelta import relativedelta
 import numpy as np
 import math
 from scipy.optimize import root
-import sys
 from fincomepy.fixedincome import FixedIncome
 
 class Bond(FixedIncome):
