@@ -1,10 +1,6 @@
 import unittest
 from datetime import date, timedelta
-from dateutil.relativedelta import relativedelta
-import numpy as np
-import math
 import sys
-from scipy.optimize import root
 sys.path.append("fincomepy")  ## TO DO: change this
 from fincomepy import BondFuture
 

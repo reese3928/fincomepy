@@ -1,6 +1,5 @@
 import unittest
 import numpy as np
-from scipy.optimize import root
 import sys
 sys.path.append("fincomepy")  ## TO DO: change this
 from fincomepy import ZspreadZero, ZspreadPar

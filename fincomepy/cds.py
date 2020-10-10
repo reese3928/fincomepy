@@ -1,7 +1,4 @@
-from datetime import date, timedelta
-from dateutil.relativedelta import relativedelta
 import numpy as np
-import math
 import sys
 sys.path.append(".")  ## TO DO: check if this is can be added to __init__.py
 from fixedincome import FixedIncome
