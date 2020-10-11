@@ -20,17 +20,15 @@ Usage
 
 ### Z-spread calculation from zero coupon bond
 
+|   Maturity |   Zero Coupon Rate |   Coupon Cash Flow |
+|-----------:|-------------------:|-------------------:|
+|          1 |               1.0% |               3.0% |
+|          2 |            1.5038% |               3.0% |
+|          3 |            1.8085% |               3.0% |
+|          4 |            2.0652% |               3.0% |
+|          5 |            2.2199% |             103.0% |
+
 ![image](docs/zspread_plot.png)
 
-.. csv-table::
-   :widths: 20, 40, 40
-   :header-rows: 1
-   :align: right
-    
-    Maturity,Zero Coupon Rate,Coupon Cash Flow
-    1,1.0%,3.0%
-    2,1.5038%,3.0%
-    3,1.8085%,3.0%
-    4,2.0652%,3.0%
-    5,2.2199%,103.0%
+
 
