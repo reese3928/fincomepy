@@ -19,9 +19,9 @@ class ZspreadZero(FixedIncome):
     def zspread(self):
         if "zspread" in self._perc_dict.keys():
             return self._perc_dict["zspread"]
-        return self.calc_zspread_from_zero()
+        return self.get_zspread()
 
-    def calc_zspread_from_zero(self, *args, **kwargs):
+    def get_zspread(self, *args, **kwargs):
         sol = root(lambda x: self.total_CF_zspread(x, self._reg_dict["zero_rates"], self._reg_dict["CF"], 
                    self._maturity) - self._reg_dict["face_value"], [0.01], *args, **kwargs)
         zspread = sol.x[0]
@@ -67,9 +67,9 @@ class ZspreadPar(ZspreadZero):
     def zspread(self):
         if "zspread" in self._perc_dict.keys():
             return self._perc_dict["zspread"]
-        return self.calc_zspread_from_par()
+        return self.get_zspread()
     
-    def calc_zspread_from_par(self):
+    def get_zspread(self, *args, **kwargs):
         discount_factor = []
         discount_factor.append(self._reg_dict["face_value"] / (self._reg_dict["face_value"] + self._reg_dict["par_rates"][0]))
         for i in range(1, self._reg_dict["par_rates"].size):
@@ -82,7 +82,7 @@ class ZspreadPar(ZspreadZero):
             self._reg_dict["zero_rates"] = (1/discount_factor)**(1/self._maturity) - 1
         else:
             self._reg_dict["zero_rates"] = -np.log(discount_factor)/self._maturity
-        self.calc_zspread_from_zero()
+        super().get_zspread(*args, **kwargs)
         return self._perc_dict["zspread"]
 
 
