@@ -56,4 +56,24 @@ with open('docs/bond_info.md', 'w') as f:
     print(series.to_markdown(colalign=("left", "right")), file=f)
 
 
+series = pd.Series({
+    "Settlement": "2020-7-15", 
+    "Maturidy": "2030-5-15", 
+    "Coupon": "0.625%",
+    "Market Price": "100.015625%",
+    "Coupon Frequency": "2",
+    "Basis": "1"
+    }, name="Bond Info")
+with open('docs/bond_info.md', 'w') as f:
+    print(series.to_markdown(colalign=("left", "right")), file=f)
+
+
+df = pd.DataFrame.from_dict({
+    "Basis": [0, 1, 2, 3 ,4],
+    "Day Count": [r"30/360", r"actual/actual", r"actual/360", 
+                r"actual/365", r"30E/360"],
+    })
+df.set_index("Basis", inplace=True)
+with open('docs/basis.md', 'w') as f:
+    print(df.to_markdown(colalign=("left", "left")), file=f)
 

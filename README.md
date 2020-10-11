@@ -20,7 +20,7 @@ Usage
 
 ### Z-spread calculation from zero coupon bond
 
-Assuing we have a 5-year bond with 3% annual coupon. Suppose the 1-5 year zero-coupon rates are 1%, 1.5038%, 1.8085%, 2.0652%, and 2.2199% respectively. i.e.
+Assuing we have a 5-year bond with 3% annual coupon. Suppose the 1-5 year zero-coupon rates are 1%, 1.5038%, 1.8085%, 2.0652% and 2.2199% respectively. i.e.
 
 |   Maturity |   Zero Coupon Rate |   Coupon Cash Flow |
 |-----------:|-------------------:|-------------------:|
@@ -88,6 +88,16 @@ pcd = Bond.couppcd(settlement=date(2020,7,15), maturity=date(2030,5,15), frequen
 print(pcd) 
 ```
 
+The "basis" argument specifies the day count convention
+| Basis   | Day Count     |
+|:--------|:--------------|
+| 0       | 30/360        |
+| 1       | actual/actual |
+| 2       | actual/360    |
+| 3       | actual/365    |
+| 4       | 30E/360       |
+
+
 * Next coupon payment date (EXCEL equivalent of COUPNCD):
 ```{python}
 ncd = Bond.coupncd(settlement=date(2020,7,15), maturity=date(2030,5,15), frequency=2, basis=1)
@@ -116,28 +126,32 @@ yld = Bond.yld(settlement=date(2020,7,15), maturity=date(2030,5,15), rate=0.625,
    pr=100.015625, redemption=100, frequency=2, basis=1)
 ```
 
+* Bond Macaulay duration, modified duration, DV01 and convexity
+
 ```{python} 
-    def mod_duration(self, yld_change_perc=0.01):
-       
-    
-    def DV01(self):
-     
-    
-    def convexity(self):
-      
-    
-    def price_change(self, yld_change_perc):
-       
-   
+# first construct a Bond object
+bond_test = Bond(settlement=date(2020,7,15), maturity=date(2030,5,15),
+   coupon_perc=0.625, price_perc=100.015625, frequency=2, basis=1)
 
-    @staticmethod
-    def parse_price(pr):
-     
+# Macaulay duration
+bond_test.mac_duration()
 
-    
+# modified duration
+bond_test.mod_duration()
+
+# DV01
+bond_test.DV01()
+
+# convexity
+bond_test.convexity()
 ```
 
-TO DO: add basis
+* Estimate bond price change with respect to yield change
+
+```{python}
+# For 0.1% change in yield, the bond price will change by:    
+bond_test.price_change(yld_change_perc=0.1)
+```
 
 ### Repo start payment, end payment, and break even yield
 ### Bond future's net basis and implied repo rate
