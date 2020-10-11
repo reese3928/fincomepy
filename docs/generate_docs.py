@@ -23,4 +23,4 @@ zspread_obj = ZspreadZero(zero_discrete, coupon_cf)
 zspread_obj.calc_zspread_from_zero()
 zspread_obj.plot_zspread()
 plt.savefig(os.path.join("docs", "zspread_plot.png"))
-
+plt.close()
