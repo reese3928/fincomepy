@@ -36,7 +36,7 @@ Z-spread calculation from zero coupon bond
 
 
 
-
+.. image:: doc/zspread_plot.png
 
 We use the following code::
 

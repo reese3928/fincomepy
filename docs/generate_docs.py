@@ -1,5 +1,8 @@
 import pandas as pd
 import os
+from fincomepy import ZspreadZero
+import numpy as np
+import matplotlib.pyplot as plt
 
 df = pd.DataFrame.from_dict({
     "Maturity": [1, 2, 3, 4, 5],
@@ -14,4 +17,10 @@ df = df[["Maturity", "Zero Coupon Rate", "Coupon Cash Flow"]]
 df.to_csv(os.path.join("docs", "zspread_from_zero.csv"), index=False)
 
 
+zero_discrete = np.array([1.0, 1.5038, 1.8085, 2.0652, 2.2199])
+coupon_cf = np.array([3.0, 3.0, 3.0, 3.0, 103.0])
+zspread_obj = ZspreadZero(zero_discrete, coupon_cf) 
+zspread_obj.calc_zspread_from_zero()
+zspread_obj.plot_zspread()
+plt.savefig(os.path.join("docs", "zspread_plot.png"))
 
