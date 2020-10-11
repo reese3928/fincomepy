@@ -22,11 +22,13 @@ Usage
 Z-spread calculation from zero coupon bond
 ###########################################
 
-.. csv-table:: 
-   :file: docs/zspread_from_zero.csv
+.. csv-table::
    :widths: 20, 40, 40
    :header-rows: 1
    :align: right
+   :url: https://raw.githubusercontent.com/reese3928/fincomepy/master/docs/zspread_from_zero.csv
+
+
 
 
 We use the following code::
