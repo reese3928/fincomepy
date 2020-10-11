@@ -99,12 +99,13 @@ class Bond(FixedIncome):
         return CF_PV_total * 100  
 
     @staticmethod
-    def yld(settlement, maturity, rate, pr, redemption, frequency, basis):
+    def yld(settlement, maturity, rate, pr, redemption, frequency, basis, *args, **kwargs):
         pcd = Bond.couppcd(settlement, maturity, frequency, basis)
         ncd = Bond.coupncd(settlement, maturity, frequency, basis)
         accrued_interest = Bond.accrint(issue=pcd, first_interest=ncd, settlement=settlement, rate=rate, par=1, frequency=frequency, basis=basis)
         dirty_price_target = accrued_interest + pr
-        sol = root(lambda x: Bond.dirty_price(settlement, maturity, rate, x, redemption, frequency, basis) - dirty_price_target, [0.01] )
+        sol = root(lambda x: Bond.dirty_price(settlement, maturity, rate, x, redemption, frequency, basis) - dirty_price_target, 
+            [0.01], *args, **kwargs)
         yld = sol.x[0]
         assert yld >= 0 and yld <= 100
         return yld
@@ -125,7 +126,7 @@ class Bond(FixedIncome):
         return (periods, CF_regular, DF)
     
     def mac_duration(self):
-        if self._mac_duration is not None:
+        if self._mac_duration:
             return self._mac_duration
         periods, CF_regular, DF = self.intermediate_values()
         CF_PV = CF_regular * DF
@@ -134,7 +135,7 @@ class Bond(FixedIncome):
         return self._mac_duration
 
     def mod_duration(self, yld_change_perc=0.01):
-        if self._mod_duration is not None:
+        if self._mod_duration:
             return self._mod_duration
         if self._yld is None:
             original_yield_perc = self.yld(self._settlement, self._maturity, self._perc_dict["coupon"], self._perc_dict["clean_price"],
@@ -155,7 +156,7 @@ class Bond(FixedIncome):
         return self._mod_duration
     
     def DV01(self):
-        if self._DV01 is not None:
+        if self._DV01:
             return self._DV01
         if self._mod_duration is None:
             self.mod_duration()
@@ -163,7 +164,7 @@ class Bond(FixedIncome):
         return self._DV01
     
     def convexity(self):
-        if self._convexity is not None:
+        if self._convexity:
             return self._convexity
         periods, CF_regular, DF = self.intermediate_values()
         CF_PV = CF_regular * DF

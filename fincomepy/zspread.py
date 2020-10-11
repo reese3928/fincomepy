@@ -21,10 +21,9 @@ class ZspreadZero(FixedIncome):
             return self._perc_dict["zspread"]
         return self.calc_zspread_from_zero()
 
-    def calc_zspread_from_zero(self):
-        ## TO DO: add solver as an option
+    def calc_zspread_from_zero(self, *args, **kwargs):
         sol = root(lambda x: self.total_CF_zspread(x, self._reg_dict["zero_rates"], self._reg_dict["CF"], 
-                   self._maturity) - self._reg_dict["face_value"], [0.01] )
+                   self._maturity) - self._reg_dict["face_value"], [0.01], *args, **kwargs)
         zspread = sol.x[0]
         assert zspread >= 0 and zspread <=1
         self._reg_dict["zspread"] = zspread

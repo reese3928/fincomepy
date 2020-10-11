@@ -31,14 +31,14 @@ class BondFuture(Bond):
             days_in_year = 360
         else:
             days_in_year = 365
-        if self._forward_pr_perc is not None:
+        if self._forward_pr_perc:
             return self._forward_pr_perc
         forward_pr_reg = self._reg_dict["dirty_price"] *  (1 + self._reg_dict["repo_rate"] * self._repo_period / days_in_year)
         self._forward_pr_perc = forward_pr_reg * 100
         return self._forward_pr_perc
     
     def full_future_val(self):
-        if self._future_val_perc is not None:
+        if self._future_val_perc:
             return self._future_val_perc
         if self._type == 'US':
             days_in_year = 360

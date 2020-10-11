@@ -26,7 +26,7 @@ class Repo(Bond):
         return cls(settlement, maturity, coupon_perc, price_perc, frequency, basis, bond_face_value, repo_period, repo_rate_perc, type)
         
     def start_payment(self):
-        if self._start_payment is not None:
+        if self._start_payment:
             return self._start_payment
         self._start_payment = self._face_value * self._reg_dict["dirty_price"]
         return self._start_payment
@@ -36,7 +36,7 @@ class Repo(Bond):
             days_in_year = 360
         else:
             days_in_year = 365
-        if self._end_payment is not None:
+        if self._end_payment:
             return self._end_payment
         repo_interest = self._start_payment * self._reg_dict["repo_rate"] * self._repo_period / days_in_year
         end_payment = self._start_payment + repo_interest
@@ -61,7 +61,7 @@ class Repo(Bond):
             return self.start_payment()
         return self.start_payment() * (1.0 - haircut_perc * 0.01)
         
-    def break_even_yld(self):
+    def break_even_yld(self, *args, **kwargs):
         self._forward_date = self._settlement + timedelta(days=self._repo_period)
         forward_ai = self.accrint(self._couppcd, self._coupncd, self._forward_date, self._perc_dict["coupon"]) * 0.01 * self._face_value
         forward_clean_price = (self._end_payment - forward_ai) / self._face_value
@@ -70,7 +70,7 @@ class Repo(Bond):
         forward_DP_regular = self._end_payment / self._face_value
         forward_DP_perc = forward_DP_regular * 100
         sol = root(lambda x: self.dirty_price(self._settlement, self._maturity, self._perc_dict["coupon"], 
-            x, self._redemption, self._frequency, self._basis) - forward_DP_perc, [0.01])
+            x, self._redemption, self._frequency, self._basis) - forward_DP_perc, [0.01], *args, **kwargs)
         forward_yield_perc = sol.x[0]
         assert forward_yield_perc >= 0 and forward_yield_perc <= 100
         return forward_yield_perc
