@@ -34,17 +34,17 @@ To calculate z-spread, first construct a ZspreadZero object:
 ```{python}
 zero_discrete = np.array([1.0, 1.5038, 1.8085, 2.0652, 2.2199])
 coupon_cf = np.array([3.0, 3.0, 3.0, 3.0, 103.0])
-zspread_obj = ZspreadZero(zero_discrete, coupon_cf) 
+zspr_test1 = ZspreadZero(zero_discrete, coupon_cf) 
 ```
 
 Obtain z-spread:
 ```{python}
-zspread_obj.get_zspread()
+zspr_test1.get_zspread()
 ```
 
 Visualize the z-spread:
 ```{python}
-zspread_obj.plot_zspread()
+zspr_test1.plot_zspread()
 ```
 
 ![image](docs/zspread_plot.png)
@@ -64,8 +64,8 @@ Assuing we have a 5-year bond with 3% annual coupon. Suppose the 1-5 year par-co
 
 Obtain z-spread:
 ```{python}
-zspread_obj2 = ZspreadPar(par_rates, coupon_cf)
-zspread_obj2.get_zspread()
+zspr_test2 = ZspreadPar(par_rates, coupon_cf)
+zspr_test2.get_zspread()
 ```
 
 ### Bond price, yield and other related calculations
@@ -200,4 +200,85 @@ repo_test.break_even_yld()
 ```
 
 ### Bond future's net basis and implied repo rate
+
+Suppose we have the following bond future information.
+
+|                   |   Bond Future Info |
+|:------------------|-------------------:|
+| Settlement        |          2020-7-15 |
+| Maturidy          |          2030-5-15 |
+| Coupon            |             0.625% |
+| Market Price      |           99.9375% |
+| Coupon Frequency  |                  2 |
+| Basis             |                  1 |
+| Repo Period       |                 30 |
+| Repo Rate         |             0.145% |
+| Future Price      |               140% |
+| Conversion Factor |                0.8 |
+
+```{python}
+# first construct a bond future object
+bf_test = BondFuture(settlement=date(2020,7,15), maturity=date(2030,5,15), coupon_perc=0.625 
+   price_perc=99.9375, frequency=2, basis=1, repo_period=30, repo_rate_perc=0.145, 
+   futures_pr_perc=140, conversion_factor=0.8)
+# similar to repo, another way to construct a bond future object is to use repo end date
+# BondFuture.from_end_date()
+```
+
+* Forward price
+```{python}
+bf_test.forward_price()
+```
+
+* Future value
+```{python}
+bf_test.full_future_val()
+```
+
+* Net basis
+```{python}
+bf_test.net_basis()
+```
+
+* Implied repo rate
+```{python}
+bf_test.implied_repo_rate()
+```
+
+
 ### CDS spread
+
+Assuing we have 1-10 years risk free bond rate of 3.12% and 1-10 years risky bond rate of 3.72%. i.e.
+
+|   Maturity |   Risk Free Rate |   Risky Rate |
+|-----------:|-----------------:|-------------:|
+|          1 |            3.12% |        3.72% |
+|          2 |            3.12% |        3.72% |
+|          3 |            3.12% |        3.72% |
+|          4 |            3.12% |        3.72% |
+|          5 |            3.12% |        3.72% |
+|          6 |            3.12% |        3.72% |
+|          7 |            3.12% |        3.72% |
+|          8 |            3.12% |        3.72% |
+|          9 |            3.12% |        3.72% |
+|         10 |            3.12% |        3.72% |
+
+To calculate CDS, first construct a CDS object:
+```{python}
+# suppose the recovery rate is 40%
+cds_test = CDS(risk_free_perc=np.array([3.12]*10), risky_perc=np.array([3.72]*10), 
+   face_value_perc=100, rr_perc=40)
+```
+
+Obtain CDS spread:
+```{python}
+cds_test.cds_spread()
+```
+
+An alternative way of constructing CDS object is to risk free rate and bond spread
+```{python}
+cds_test2  = CDS.from_bond_spread(risk_free_perc=np.array([3.12]*10), 
+   spread_perc=np.array([0.6]*10), face_value_perc=100, rr_perc=40)
+cds_test2.cds_spread()
+```
+

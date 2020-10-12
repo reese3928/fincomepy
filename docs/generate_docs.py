@@ -78,7 +78,6 @@ with open('docs/basis.md', 'w') as f:
     print(df.to_markdown(colalign=("left", "left")), file=f)
 
 
-
 series = pd.Series({
     "Settlement": "2020-7-15", 
     "Maturidy": "2030-5-15", 
@@ -92,3 +91,34 @@ series = pd.Series({
     }, name="Repo and Bond Info")
 with open('docs/repo_info.md', 'w') as f:
     print(series.to_markdown(colalign=("left", "right")), file=f)
+
+
+series = pd.Series({
+    "Settlement": "2020-7-15", 
+    "Maturidy": "2030-5-15", 
+    "Coupon": "0.625%",
+    "Market Price": "99.9375%",
+    "Coupon Frequency": "2",
+    "Basis": "1",
+    "Repo Period": "30",
+    "Repo Rate": "0.145%",
+    "Future Price": "140%",
+    "Conversion Factor": "0.8"
+    }, name="Bond Future Info")
+with open('docs/bond_future_info.md', 'w') as f:
+    print(series.to_markdown(colalign=("left", "right")), file=f)
+
+
+df = pd.DataFrame.from_dict({
+    "Maturity": list(range(1, 11)),
+    "Risk Free Rate": [3.12] * 10,
+    "Risky Rate": [3.72] * 10
+    })
+df["Risk Free Rate"] = df["Risk Free Rate"].astype(str)
+df["Risk Free Rate"] += "%"
+df["Risky Rate"] = df["Risky Rate"].astype(str)
+df["Risky Rate"] += "%"
+df = df[["Maturity", "Risk Free Rate", "Risky Rate"]]
+df.set_index("Maturity", inplace=True)
+with open('docs/cds.md', 'w') as f:
+    print(df.to_markdown(colalign=("right", "right", "right")), file=f)
