@@ -32,14 +32,17 @@ class FixedIncome(object):
         in both dictionaries are updated such that for each key, the value in _reg_dict is equal to 
         0.01 times the value in _perc_dict. 
         '''
+        # update keys and values in _reg_dict
         for key, value in self._reg_dict.items():
             if key not in self._perc_dict.keys():
                 self._perc_dict[key] = value * 100
         
+        # update keys and values in _perc_dict
         for key, value in self._perc_dict.items():
             if key not in self._reg_dict.keys():
                 self._reg_dict[key] = value * 0.01
         
+        # make sure the values in two dictionaries matches
         for key, value in self._perc_dict.items():
             if isinstance(value, np.ndarray):
                 assert (self._reg_dict[key] == value * 0.01).all()

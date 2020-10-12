@@ -4,7 +4,52 @@ import matplotlib.pyplot as plt
 from fincomepy.fixedincome import FixedIncome
 
 class ZspreadZero(FixedIncome):
+    '''
+    A class used to calculate z-spread from zero-coupon bonds.
+
+    Attributes
+    ----------
+    _reg_dict : dict
+        A dictionary which contains the regular quantities. The keys of _reg_dict should be the
+        same as that of _perc_dict.
+    _perc_dict : dict
+        A dictionary which contains the quantities in percent. The keys of _perc_dict should be the
+        same as that of _reg_dict.
+    _maturity: np.array
+        A numpy array which contains he maturity of each zero-coupon bonds (in years). 
+
+    Methods
+    -------
+    get_zspread(*args, **kwargs)
+        Calculate and return z-spread.
+    plot_zspread(maturity=None, zero_rates_perc=None, zspread=None)
+        Visualize z-spread by plotting zero-coupon rates and bond pricing rates.
+    total_CF_zspread(zspread, zero_rates_regular, CF_regular, maturity)
+        Calculate the total cash flow.
+    '''
+
     def __init__(self, zero_rates_perc, CF_perc, face_value_perc=100, maturity=None):
+        """Constructor for ZspreadZero.
+
+        Parameters
+        ----------
+        zero_rates_perc : np.array
+            Zero-coupon rates (in percent).
+        CF_perc : np.array
+            Cash flow of bond (in percent).
+        face_value_perc : float
+            The face value of bond (in percent).
+        maturity : np.array, optional
+            A numpy array which contains he maturity of each zero-coupon bonds (in years).
+            Default is None.
+        
+        Examples
+        --------
+        >>> zero_discrete = np.array([1.0, 1.5038, 1.8085, 2.0652, 2.2199])
+        >>> coupon_cf = np.array([3.0, 3.0, 3.0, 3.0, 103.0])
+        >>> zspr_test1 = ZspreadZero(zero_discrete, coupon_cf)  
+        """
+
         super().__init__()
         self._perc_dict["zero_rates"] = zero_rates_perc
         self._perc_dict["CF"] = CF_perc
@@ -22,6 +67,29 @@ class ZspreadZero(FixedIncome):
         return self.get_zspread()
 
     def get_zspread(self, *args, **kwargs):
+        """Calculate and return z-spread.
+
+        Parameters
+        ----------
+        *args : optional
+            Positional argument passed to scipy.optimize.root.
+        **kwargs : optional
+            Keyword argument passed to scipy.optimize.root. 
+        
+        Returns
+        -------
+        float
+            The calculated z-spread (in percent).
+        
+        Examples
+        --------
+        >>> zero_discrete = np.array([1.0, 1.5038, 1.8085, 2.0652, 2.2199])
+        >>> coupon_cf = np.array([3.0, 3.0, 3.0, 3.0, 103.0])
+        >>> zspr_test1 = ZspreadZero(zero_discrete, coupon_cf) 
+        >>> zspr_test1.get_zspread()
+        0.8071473072171145
+        """
+
         sol = root(lambda x: self.total_CF_zspread(x, self._reg_dict["zero_rates"], self._reg_dict["CF"], 
                    self._maturity) - self._reg_dict["face_value"], [0.01], *args, **kwargs)
         zspread = sol.x[0]
@@ -30,15 +98,38 @@ class ZspreadZero(FixedIncome):
         self.update_dict()
         return self._perc_dict["zspread"]
 
-    def plot_zspread(self, maturity=None, zero_rates_perc=None, zspread=None):
+    def plot_zspread(self, maturity=None, zero_rates_perc=None, zspread_perc=None):
+        '''
+        Visualize z-spread by plotting zero-coupon rates and bond pricing rates.
+
+        Parameters
+        ----------
+        maturity : np.array, optional
+            A numpy array which contains he maturity of each zero-coupon bonds (in years).
+            Default is None.
+        zero_rates_perc : np.array, optional
+            Zero-coupon rates (in percent). Default is None.
+        zspread_perc : float, optional
+            User-supplied z-spread (in percent). Default is None.
+        
+        Examples
+        --------
+        >>> zero_discrete = np.array([1.0, 1.5038, 1.8085, 2.0652, 2.2199])
+        >>> coupon_cf = np.array([3.0, 3.0, 3.0, 3.0, 103.0])
+        >>> zspr_test1 = ZspreadZero(zero_discrete, coupon_cf) 
+        >>> zspr_test1.get_zspread()
+        >>> zspr_test1.plot_zspread()
+        '''
+
         if maturity is None:
             maturity = self._maturity
         if zero_rates_perc is None:
             zero_rates_perc = self._perc_dict["zero_rates"]
-        if zspread is None:
-            zspread = self.zspread
+        if zspread_perc is None:
+            zspread_perc = self.zspread
         plt.plot(maturity, zero_rates_perc, label="Zero-Coupon Rates")
-        plt.plot(maturity, zspread + zero_rates_perc, label="Bond Pricing Rates")
+        plt.plot(maturity, zspread_perc + zero_rates_perc, label="Bond Pricing Rates")
+        plt.xticks(maturity)
         plt.xlabel("Maturity")
         plt.ylabel(r"Rates(%)")
         plt.grid(linewidth=0.5)
@@ -46,6 +137,7 @@ class ZspreadZero(FixedIncome):
     
     @staticmethod
     def total_CF_zspread(zspread, zero_rates_regular, CF_regular, maturity):
+        '''Calculate the total cash flow.'''
         CF_each_period = CF_regular/ (1 + zero_rates_regular + zspread) ** maturity
         return np.sum(CF_each_period)
 

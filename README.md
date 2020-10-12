@@ -55,7 +55,7 @@ coupon_cf = np.array([3.0, 3.0, 3.0, 3.0, 103.0])
 zspr_test1 = ZspreadZero(zero_discrete, coupon_cf) 
 ```
 
-Obtain z-spread:
+Obtain z-spread (the value returned is in percentage):
 ```{python}
 zspr_test1.get_zspread()
 ```
@@ -81,7 +81,7 @@ Assuing we have a 5-year bond with 3% annual coupon. Suppose the 1-5 year par-co
 |          4 |             2.05% |               3.0% |
 |          5 |              2.2% |             103.0% |
 
-Obtain z-spread:
+Obtain z-spread (the value returned is in percentage):
 ```{python}
 par_rates = np.array([1.00, 1.50, 1.80, 2.05, 2.20])
 zspr_test2 = ZspreadPar(par_rates, coupon_cf)
