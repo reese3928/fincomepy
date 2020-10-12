@@ -28,6 +28,13 @@ python setup.py install
 
 Usage
 ----------
+First import packages
+```{python}
+import numpy as np
+import matplotlib.pyplot as plt
+from datetime import date
+from fincomepy import *
+```
 
 ### Z-spread calculation from zero coupon bond
 
@@ -56,6 +63,7 @@ zspr_test1.get_zspread()
 Visualize the z-spread:
 ```{python}
 zspr_test1.plot_zspread()
+plt.show()
 ```
 
 ![image](docs/zspread_plot.png)
@@ -75,6 +83,7 @@ Assuing we have a 5-year bond with 3% annual coupon. Suppose the 1-5 year par-co
 
 Obtain z-spread:
 ```{python}
+par_rates = np.array([1.00, 1.50, 1.80, 2.05, 2.20])
 zspr_test2 = ZspreadPar(par_rates, coupon_cf)
 zspr_test2.get_zspread()
 ```
@@ -229,7 +238,7 @@ Suppose we have the following bond future information.
 
 ```{python}
 # first construct a bond future object
-bf_test = BondFuture(settlement=date(2020,7,15), maturity=date(2030,5,15), coupon_perc=0.625 
+bf_test = BondFuture(settlement=date(2020,7,15), maturity=date(2030,5,15), coupon_perc=0.625, 
    price_perc=99.9375, frequency=2, basis=1, repo_period=30, repo_rate_perc=0.145, 
    futures_pr_perc=140, conversion_factor=0.8)
 # similar to repo, another way to construct a bond future object is to use repo end date

@@ -41,6 +41,7 @@ class ZspreadZero(FixedIncome):
         plt.plot(maturity, zspread + zero_rates_perc, label="Bond Pricing Rates")
         plt.xlabel("Maturity")
         plt.ylabel(r"Rates(%)")
+        plt.grid(linewidth=0.5)
         plt.legend()
     
     @staticmethod
