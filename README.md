@@ -154,5 +154,50 @@ bond_test.price_change(yld_change_perc=0.1)
 ```
 
 ### Repo start payment, end payment, and break even yield
+
+Suppose we have a bond and repo with following information.
+
+|                  |   Repo and Bond Info |
+|:-----------------|---------------------:|
+| Settlement       |            2020-7-15 |
+| Maturidy         |            2030-5-15 |
+| Coupon           |               0.625% |
+| Market Price     |             99.9375% |
+| Coupon Frequency |                    2 |
+| Basis            |                    1 |
+| Face Value       |         $100,000,000 |
+| Repo Period      |                    1 |
+| Repo Rate        |               0.145% |
+
+* Repo purchase price
+
+```{python}
+# first construct a repo object
+repo_test = Repo(settlement=date(2020,7,15), maturity=date(2030,5,15), 
+   coupon_perc=0.625, price_perc=(99+30/32), frequency=2, basis=1, 
+   bond_face_value=100000000, repo_period=1, repo_rate_perc=0.145)
+# another way to construct a repo object is to use repo end date
+repo_test2 = Repo.from_end_date(settlement=date(2020,7,15), maturity=date(2030,5,15),
+   coupon_perc=0.625, price_perc=(99+30/32), frequency=2, basis=1, 
+   bond_face_value=100000000, repo_end_date=date(2020,7,16), repo_rate_perc=0.145)
+
+# purchase price without margin or haircut
+repo_test.start_payment()
+# purchase price with margin
+repo_test.purchase_pr_with_margin(margin_perc=102)
+# purchase price with haircut
+repo_test.purchase_pr_with_haircut(haircut_perc=2)
+```
+
+* Repo end payment
+```{python}
+repo_test.end_payment()
+```
+
+* Break even yield
+```{python}
+repo_test.break_even_yld()
+```
+
 ### Bond future's net basis and implied repo rate
 ### CDS spread
