@@ -277,7 +277,7 @@ cds_test.cds_spread()
 
 An alternative way of constructing CDS object is to risk free rate and bond spread
 ```{python}
-cds_test2  = CDS.from_bond_spread(risk_free_perc=np.array([3.12]*10), 
+cds_test2 = CDS.from_bond_spread(risk_free_perc=np.array([3.12]*10), 
    spread_perc=np.array([0.6]*10), face_value_perc=100, rr_perc=40)
 cds_test2.cds_spread()
 ```
