@@ -15,6 +15,17 @@ Author
 
 * [Xu Ren](https://github.com/reese3928) (xuren2120@gmail.com)
 
+Installation
+-------------
+In the command line:
+```
+make install 
+```
+or
+```
+python setup.py install
+```
+
 Usage
 ----------
 
