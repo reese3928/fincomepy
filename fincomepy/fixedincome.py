@@ -8,16 +8,16 @@ class FixedIncome(object):
     Attributes
     ----------
     _reg_dict : dict
-        a dictionary which contains the regular quantities. The keys of _reg_dict should be the
+        A dictionary which contains the regular quantities. The keys of _reg_dict should be the
         same as that of _perc_dict
     _perc_dict : dict
-        a dictionary which contains the quantities in percent. The keys of _perc_dict should be the
+        A dictionary which contains the quantities in percent. The keys of _perc_dict should be the
         same as that of _reg_dict
 
     Methods
     -------
     update_dict()
-        Updates both _reg_dict and _perc_dict.
+        Update both _reg_dict and _perc_dict.
     '''
 
     def __init__(self):
@@ -26,7 +26,7 @@ class FixedIncome(object):
     
     def update_dict(self):
         '''
-        Updates both _reg_dict and _perc_dict.
+        Update both _reg_dict and _perc_dict.
 
         This function updates _reg_dict and _perc_dict by making them have the same keys. The values
         in both dictionaries are updated such that for each key, the value in _reg_dict is equal to 

@@ -45,6 +45,12 @@ class Test(unittest.TestCase):
         self.assertTrue("zspread" in obj2._perc_dict.keys())
         self.assertTrue("zspread" in obj2._reg_dict.keys())
 
+    def test_invalid_input(self):
+        par_rates = np.array([2.67, 2.80, 2.92, 3.03, 3.13, 3.22, 3.29, 3.35, 3.40, 3.44])
+        coupon_cf = np.array([4.0]*9 + [104.0])
+        with self.assertRaises(Exception):
+            obj2 = ZspreadPar(par_rates, coupon_cf, compound="unknown")
+
 
 if __name__ == '__main__':
     unittest.main()

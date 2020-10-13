@@ -143,11 +143,62 @@ class ZspreadZero(FixedIncome):
 
 
 class ZspreadPar(ZspreadZero):
+    '''
+    A class used to calculate z-spread from par-coupon bonds.
+
+    Attributes
+    ----------
+    _reg_dict : dict
+        A dictionary which contains the regular quantities. The keys of _reg_dict should be the
+        same as that of _perc_dict.
+    _perc_dict : dict
+        A dictionary which contains the quantities in percent. The keys of _perc_dict should be the
+        same as that of _reg_dict.
+    _compound : str
+        A string that is either "discrete" or "continuous". It specifies whether discrete or continuous
+        zero coupon rate will be used.
+    _maturity: np.array
+        A numpy array which contains he maturity of each zero-coupon bonds (in years). 
+
+    Methods
+    -------
+    get_zspread(*args, **kwargs)
+        Calculate and return z-spread.
+    plot_zspread(maturity=None, zero_rates_perc=None, zspread=None)
+        Visualize z-spread by plotting zero-coupon rates and bond pricing rates.
+    '''
+
     def __init__(self, par_rates_perc, CF_perc, face_value_perc=100, compound="discrete", maturity=None):
+        '''Constructor for ZspreadPar.
+
+        Parameters
+        ----------
+        par_rates_perc : np.array
+            Par-coupon rates (in percent).
+        CF_perc : np.array
+            Cash flow of bond (in percent).
+        face_value_perc : float
+            The face value of bond (in percent).
+        compound : str
+            A string that is either "discrete" or "continuous". It specifies whether discrete or continuous
+            zero coupon rate will be used. Default is "discrete". 
+        maturity : np.array, optional
+            A numpy array which contains he maturity of each zero-coupon bonds (in years).
+            Default is None.
+        
+        Examples
+        --------
+        >>> coupon_cf = np.array([3.0, 3.0, 3.0, 3.0, 103.0])
+        >>> par_rates = np.array([1.00, 1.50, 1.80, 2.05, 2.20])
+        >>> zspr_test2 = ZspreadPar(par_rates, coupon_cf)
+        '''
+
         FixedIncome.__init__(self)
         self._perc_dict["par_rates"] = par_rates_perc
         self._perc_dict["CF"] = CF_perc
         self._perc_dict["face_value"] = face_value_perc
+        if compound not in ["discrete", "continuous"]:
+            raise Exception(r"compound should be either 'discrete' or 'continuous' ")
         self._compound = compound
         if maturity is None:
             self._maturity = np.arange(self._perc_dict["par_rates"].size) + 1
@@ -163,6 +214,30 @@ class ZspreadPar(ZspreadZero):
         return self.get_zspread()
     
     def get_zspread(self, *args, **kwargs):
+        """Calculate and return z-spread.
+
+        Parameters
+        ----------
+        *args : optional
+            Positional argument passed to scipy.optimize.root.
+        **kwargs : optional
+            Keyword argument passed to scipy.optimize.root. 
+        
+        Returns
+        -------
+        float
+            The calculated z-spread (in percent).
+        
+        Examples
+        --------
+        >>> coupon_cf = np.array([3.0, 3.0, 3.0, 3.0, 103.0])
+        >>> par_rates = np.array([1.00, 1.50, 1.80, 2.05, 2.20])
+        >>> zspr_test2 = ZspreadPar(par_rates, coupon_cf)
+        >>> zspr_test2.get_zspread()
+        0.8071642537725563
+        """
+
+        # calculate discount factors
         discount_factor = []
         discount_factor.append(self._reg_dict["face_value"] / (self._reg_dict["face_value"] + self._reg_dict["par_rates"][0]))
         for i in range(1, self._reg_dict["par_rates"].size):
@@ -171,10 +246,12 @@ class ZspreadPar(ZspreadZero):
             discount_factor.append(df)
         discount_factor = np.array(discount_factor)
         self._discount_factor = discount_factor
+        # convert discount factors into discrete or continuous zero coupon rates
         if self._compound == "discrete":
-            self._reg_dict["zero_rates"] = (1/discount_factor)**(1/self._maturity) - 1
+            self._reg_dict["zero_rates"] = (1 / discount_factor) ** (1 / self._maturity) - 1
         else:
-            self._reg_dict["zero_rates"] = -np.log(discount_factor)/self._maturity
+            self._reg_dict["zero_rates"] = -np.log(discount_factor) / self._maturity
+        # obtain zspread by calling get_zspread function in the parent class
         super().get_zspread(*args, **kwargs)
         return self._perc_dict["zspread"]
 
