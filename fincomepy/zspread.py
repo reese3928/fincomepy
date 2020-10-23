@@ -16,7 +16,7 @@ class ZspreadZero(FixedIncome):
         A dictionary which contains the quantities in percent. The keys of _perc_dict should be the
         same as that of _reg_dict.
     _maturity: np.array
-        A numpy array which contains he maturity of each zero-coupon bonds (in years). 
+        A numpy array which contains the maturity of each zero-coupon bonds (in years). 
 
     Methods
     -------
@@ -158,7 +158,7 @@ class ZspreadPar(ZspreadZero):
         A string that is either "discrete" or "continuous". It specifies whether discrete or continuous
         zero coupon rate will be used.
     _maturity: np.array
-        A numpy array which contains he maturity of each zero-coupon bonds (in years). 
+        A numpy array which contains the maturity of each zero-coupon bonds (in years). 
 
     Methods
     -------

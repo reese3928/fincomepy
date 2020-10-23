@@ -6,7 +6,54 @@ from scipy.optimize import root
 from fincomepy.fixedincome import FixedIncome
 
 class Bond(FixedIncome):
+    '''
+    A class used to perform bond related calculations.
+
+    Attributes
+    ----------
+    _reg_dict : dict
+        A dictionary which contains the regular quantities. The keys of _reg_dict should be the
+        same as that of _perc_dict.
+    _perc_dict : dict
+        A dictionary which contains the quantities in percent. The keys of _perc_dict should be the
+        same as that of _reg_dict.
+    _settlement: datetime.date
+        A date object which specifies the bond settlement date.
+    _maturity: datetime.date
+        A date object which specifies the maturity date.
+    _frequency: int
+        An integer which specifies coupon payment frequency.
+    _basis: int
+        An integer which indicates day count convention. 
+    _redemption: float
+        A float which specifies bond redemption (in percent). 
+    _couppcd: datetime.date
+        A date object which indicates the previous coupon payment date.
+    _coupncd: datetime.date
+        A date object which indicates the next coupon payment date.
+    _yld: float
+        A float which indicates bond yield (in percent).
+    _mac_duration: float
+        A float which indicates the Macaulay duration of a bond.
+    _mod_duration: float
+        A float which indicates the modified duration of a bond.
+    _DV01: float
+        A float which indicates the DV01 of a bond.
+    _convexity: float
+        A float which indicates the convexity of a bond.
+    '''
+
     def __init__(self, settlement, maturity, coupon_perc, price_perc, frequency, basis=1, redemption=100, yld=None):
+        
+        '''
+        0: 30/360
+        1: actual/actual
+        2: actual/360
+        3: actual/365
+        4: 30E/360
+    
+        '''
+        
         super().__init__()
         self._settlement = settlement
         self._maturity = maturity
@@ -18,7 +65,7 @@ class Bond(FixedIncome):
         self._couppcd = Bond.couppcd(settlement, maturity, frequency, basis)
         self._coupncd = Bond.coupncd(settlement, maturity, frequency, basis)
         self._perc_dict["accrint"] = Bond.accrint(issue=self._couppcd, first_interest=self._coupncd, settlement=self._settlement,
-                                                  rate=self._perc_dict["coupon"], par=1, frequency=self._frequency, basis=self._basis)
+            rate=self._perc_dict["coupon"], par=1, frequency=self._frequency, basis=self._basis)
         self._perc_dict["dirty_price"] = self._perc_dict["clean_price"] + self._perc_dict["accrint"]
         self.update_dict()
         self._yld = yld   ## TO DO: check if yld can be put into perc_dict
@@ -182,7 +229,7 @@ class Bond(FixedIncome):
         DV01 = self.DV01()
         convexity = self.convexity()
         yld_change_reg = yld_change_perc * 0.01
-        price_change_reg = - DV01 * yld_change_reg + self._reg_dict["dirty_price"] * convexity / 2 * (yld_change_reg ** 2)
+        price_change_reg = (-1) * DV01 * yld_change_reg + self._reg_dict["dirty_price"] * convexity / 2 * (yld_change_reg ** 2)
         return price_change_reg * 100
             
     @staticmethod
