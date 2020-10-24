@@ -41,6 +41,15 @@ class Bond(FixedIncome):
         A float which indicates the DV01 of a bond.
     _convexity: float
         A float which indicates the convexity of a bond.
+    
+    Methods
+    -------
+    couppcd(settlement, maturity, frequency, basis)
+        Get the previous coupon payment date.
+    coupncd(settlement, maturity, frequency, basis)
+        Get the next coupon payment date.
+    accrint(issue, first_interest, settlement, rate, par, frequency, basis)
+        Calculate the accrued interest of coupon.
     '''
 
     def __init__(self, settlement, maturity, coupon_perc, price_perc, frequency, basis=1, redemption=100, yld=None):
