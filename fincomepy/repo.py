@@ -51,7 +51,7 @@ class Repo(Bond):
         return self._end_payment
 
     @staticmethod
-    def get_start_payment(bond_face_value, dirty_price_perc):
+    def get_start_payment(bond_face_value, dirty_price_perc, margin_perc=None, haircut_perc=None):
         '''Calculate repo start payment based on bond face value and dirty price.
 
         Parameters
@@ -68,11 +68,18 @@ class Repo(Bond):
         
         Examples
         --------
-        >>> ncd = Bond.coupncd(settlement=date(2020,7,15), maturity=date(2030,5,15), frequency=2, basis=1)
-        >>> print(ncd)
-        2020-11-15
+        >>> start_payment = Repo.get_start_payment(bond_face_value=100000000, dirty_price_perc=100.06)
+        >>> print(start_payment)
+        100060000.0
         '''
-        return bond_face_value * dirty_price_perc * 0.01
+        start_payment = bond_face_value * dirty_price_perc * 0.01
+        if margin_perc and haircut_perc:
+            print("Warning: both margin and haircut are provided. Only margin is used.")
+        if margin_perc:
+            return start_payment / margin_perc * 100
+        if haircut_perc:
+            return start_payment * (1.0 - haircut_perc * 0.01)
+        return start_payment
 
     @staticmethod
     def get_end_payment(bond_face_value, dirty_price_perc, repo_rate_perc, repo_period, type="US"):
@@ -99,10 +106,10 @@ class Repo(Bond):
         
         Examples
         --------
-        100.06
-        >>> ncd = Bond.coupncd(settlement=date(2020,7,15), maturity=date(2030,5,15), frequency=2, basis=1)
-        >>> print(ncd)
-        2020-11-15
+        >>> end_payment = Repo.get_end_payment(bond_face_value=100000000, dirty_price_perc=100.06,
+            repo_period=32, repo_rate_perc=0.145, type='US')
+        >>> print(end_payment)
+        100072896.62222221
         '''
         if type == 'US':
             days_in_year = 360

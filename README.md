@@ -38,7 +38,8 @@ from fincomepy import *
 
 ### Z-spread calculation from zero coupon bond
 
-Assuing we have a 5-year bond with 3% annual coupon. Suppose the 1-5 year zero-coupon rates are 1%, 1.5038%, 1.8085%, 2.0652% and 2.2199% respectively. i.e.
+Assuing we have a 5-year bond with 3% annual coupon. Suppose the 1-5 year zero-coupon rates are 1%, 
+1.5038%, 1.8085%, 2.0652% and 2.2199% respectively. i.e.
 
 |   Maturity |   Zero Coupon Rate |   Coupon Cash Flow |
 |-----------:|-------------------:|-------------------:|
@@ -71,7 +72,8 @@ plt.show()
 
 ### Z-spread calculation from par coupon bond
 
-Assuing we have a 5-year bond with 3% annual coupon. Suppose the 1-5 year par-coupon rates are 1%, 1.5%, 1.8%, 2.05%, and 2.2% respectively. i.e.
+Assuing we have a 5-year bond with 3% annual coupon. Suppose the 1-5 year par-coupon rates are 1%, 
+1.5%, 1.8%, 2.05%, and 2.2% respectively. i.e.
 
 |   Maturity |   Par Coupon Rate |   Coupon Cash Flow |
 |-----------:|------------------:|-------------------:|
@@ -95,7 +97,7 @@ Suppose we have a bond with following information.
 |                  |   Bond Info |
 |:-----------------|------------:|
 | Settlement       |   2020-7-15 |
-| Maturidy         |   2030-5-15 |
+| Maturity         |   2030-5-15 |
 | Coupon           |      0.625% |
 | Market Price     | 100.015625% |
 | Coupon Frequency |           2 |
@@ -181,7 +183,7 @@ Suppose we have a bond and repo with following information.
 |                  |   Repo and Bond Info |
 |:-----------------|---------------------:|
 | Settlement       |            2020-7-15 |
-| Maturidy         |            2030-5-15 |
+| Maturity         |            2030-5-15 |
 | Coupon           |               0.625% |
 | Market Price     |             99.9375% |
 | Coupon Frequency |                    2 |
@@ -215,6 +217,16 @@ repo_test.purchase_pr_with_haircut(haircut_perc=2)
 repo_test.end_payment()
 ```
 
+The Repo purchase and end payment can also be obtained by providing only partial bond information.
+
+```{python}
+start_payment = Repo.get_start_payment(bond_face_value=100000000, dirty_price_perc=100.06)
+print(start_payment)
+end_payment = Repo.get_end_payment(bond_face_value=100000000, dirty_price_perc=100.06,
+   repo_period=32, repo_rate_perc=0.145, type='US')
+print(end_payment)
+```
+
 * Break even yield
 ```{python}
 repo_test.break_even_yld()
@@ -227,7 +239,7 @@ Suppose we have the following bond future information.
 |                   |   Bond Future Info |
 |:------------------|-------------------:|
 | Settlement        |          2020-7-15 |
-| Maturidy          |          2030-5-15 |
+| Maturity          |          2030-5-15 |
 | Coupon            |             0.625% |
 | Market Price      |           99.9375% |
 | Coupon Frequency  |                  2 |

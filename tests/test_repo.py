@@ -39,6 +39,12 @@ class Test(unittest.TestCase):
         end_payment = Repo.get_end_payment(bond_face_value=100000000, dirty_price_perc=dirty_price, 
             repo_period=32, repo_rate_perc=0.145, type='US')
         self.assertTrue(abs(end_payment - 100071320.33) < 0.01)
+        start_payment = Repo.get_start_payment(bond_face_value=100000000, dirty_price_perc=dirty_price,
+            margin_perc=102)
+        self.assertTrue(abs(start_payment - 98096494.03) < 0.01)
+        start_payment = Repo.get_start_payment(bond_face_value=100000000, dirty_price_perc=dirty_price,
+            haircut_perc=2)
+        self.assertTrue(abs(start_payment - 98057255.43) < 0.01)
         
     def test_from_end_date(self):
         repo_test = Repo(settlement=date(2020,7,17), maturity=date(2028,10,22), coupon_perc= (1 + 5/8), 

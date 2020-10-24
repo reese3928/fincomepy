@@ -46,7 +46,7 @@ with open('docs/zspread_from_par.md', 'w') as f:
 
 series = pd.Series({
     "Settlement": "2020-7-15", 
-    "Maturidy": "2030-5-15", 
+    "Maturity": "2030-5-15", 
     "Coupon": "0.625%",
     "Market Price": "100.015625%",
     "Coupon Frequency": "2",
@@ -58,7 +58,7 @@ with open('docs/bond_info.md', 'w') as f:
 
 series = pd.Series({
     "Settlement": "2020-7-15", 
-    "Maturidy": "2030-5-15", 
+    "Maturity": "2030-5-15", 
     "Coupon": "0.625%",
     "Market Price": "100.015625%",
     "Coupon Frequency": "2",
@@ -80,7 +80,7 @@ with open('docs/basis.md', 'w') as f:
 
 series = pd.Series({
     "Settlement": "2020-7-15", 
-    "Maturidy": "2030-5-15", 
+    "Maturity": "2030-5-15", 
     "Coupon": "0.625%",
     "Market Price": "99.9375%",
     "Coupon Frequency": "2",
@@ -95,7 +95,7 @@ with open('docs/repo_info.md', 'w') as f:
 
 series = pd.Series({
     "Settlement": "2020-7-15", 
-    "Maturidy": "2030-5-15", 
+    "Maturity": "2030-5-15", 
     "Coupon": "0.625%",
     "Market Price": "99.9375%",
     "Coupon Frequency": "2",
