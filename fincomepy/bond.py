@@ -50,6 +50,26 @@ class Bond(FixedIncome):
         Get the next coupon payment date.
     accrint(issue, first_interest, settlement, rate, par, frequency, basis)
         Calculate the accrued interest of coupon.
+    dirty_price(settlement, maturity, rate, yld, redemption, frequency, basis)
+        Calculate the dirty price of a bond.
+    yld(settlement, maturity, rate, pr, redemption, frequency, basis, *args, **kwargs)
+        Calculate the yield of a bond.
+    mac_duration()
+        Calculate the Macaulay duration of a bond.
+    mod_duration(yld_change_perc)
+        Calculate the modified duration of a bond.
+    DV01()
+        Calculate the DV01 of a bond.
+    convexity()
+        Calculate the convexity of a bond.
+    price_change(yld_change_perc)
+        Calculate the bond price change based on yield change.
+    diff_month(date1, date2)
+        Get the month difference between two dates.
+    last_day_in_month(original_date)
+        Get the last day for the input month
+    coupon_dates()
+        Obtain the coupon payment dates of a bond.
     '''
 
     def __init__(self, settlement, maturity, coupon_perc, price_perc, frequency, basis=1, redemption=100, yld=None):
@@ -67,7 +87,7 @@ class Bond(FixedIncome):
         self._settlement = settlement
         self._maturity = maturity
         self._perc_dict["coupon"] = coupon_perc
-        self._perc_dict["clean_price"] = self.parse_price(price_perc)
+        self._perc_dict["clean_price"] = self._parse_price(price_perc)
         self._frequency = frequency
         self._basis = basis
         self._redemption = redemption
@@ -109,13 +129,13 @@ class Bond(FixedIncome):
             return (settlement - issue).days / 360 * rate
         if basis == 3:
             return (settlement - issue).days / 365 * rate
-        total_days = Bond.day_count(issue, first_interest, basis)
-        accrued_days = Bond.day_count(issue, settlement, basis)
+        total_days = Bond._day_count(issue, first_interest, basis)
+        accrued_days = Bond._day_count(issue, settlement, basis)
         accrued_interest = (rate / frequency) * (accrued_days / total_days)
         return accrued_interest * par
     
     @staticmethod
-    def day_count(date1, date2, basis):
+    def _day_count(date1, date2, basis):
         if basis == 0:
             Y1, M1, D1 = date1.year, date1.month, date1.day
             Y2, M2, D2 = date2.year, date2.month, date2.day
@@ -166,7 +186,7 @@ class Bond(FixedIncome):
         assert yld >= 0 and yld <= 100
         return yld
 
-    def intermediate_values(self):
+    def _intermediate_values(self):
         coupon_interval = 12 / self._frequency  
         nperiod = math.ceil((Bond.diff_month(self._settlement, self._maturity))/coupon_interval) 
         first_period = (self._coupncd - self._settlement).days / (self._coupncd - self._couppcd).days
@@ -184,7 +204,7 @@ class Bond(FixedIncome):
     def mac_duration(self):
         if self._mac_duration:
             return self._mac_duration
-        periods, CF_regular, DF = self.intermediate_values()
+        periods, CF_regular, DF = self._intermediate_values()
         CF_PV = CF_regular * DF
         CF_PV_times_p = CF_PV * periods
         self._mac_duration = CF_PV_times_p.sum() / self._reg_dict["dirty_price"] / self._frequency
@@ -222,7 +242,7 @@ class Bond(FixedIncome):
     def convexity(self):
         if self._convexity:
             return self._convexity
-        periods, CF_regular, DF = self.intermediate_values()
+        periods, CF_regular, DF = self._intermediate_values()
         CF_PV = CF_regular * DF
         CF_PV_times_p = CF_PV * periods
         CF_PV_times_p_2 = CF_PV * periods * periods
@@ -251,7 +271,7 @@ class Bond(FixedIncome):
         return next_month - timedelta(days=next_month.day)
 
     @staticmethod
-    def parse_price(pr):
+    def _parse_price(pr):
         if not isinstance(pr, (int, float, str)):
             raise Exception('price should be int, float, or str.')
         if isinstance(pr, (int, float)):
