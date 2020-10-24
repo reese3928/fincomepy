@@ -5,7 +5,6 @@ from fincomepy.fixedincome import FixedIncome
 from fincomepy.bond import Bond
 
 class Repo(Bond):
-    ## TO DO: add repo constructor without bond information
     def __init__(self, settlement, maturity, coupon_perc, price_perc, frequency, basis, 
                  bond_face_value, repo_period, repo_rate_perc, type='US'):
         FixedIncome.__init__(self)
@@ -14,7 +13,7 @@ class Repo(Bond):
         self._perc_dict["repo_rate"] = repo_rate_perc
         self._face_value = bond_face_value
         self._repo_end_date = self._settlement + timedelta(days=repo_period)
-        self._type = type   ## TO DO: figure out a way to change this type argument
+        self._type = type  
         self.update_dict()
         self._start_payment = None
         self._end_payment = None
@@ -50,6 +49,69 @@ class Repo(Bond):
                 int_on_coupon += coupon_one_period * self._reg_dict["repo_rate"] * (self._repo_end_date - item).days / days_in_year
         self._end_payment = end_payment - coupon_payment - int_on_coupon
         return self._end_payment
+
+    @staticmethod
+    def get_start_payment(bond_face_value, dirty_price_perc):
+        '''Calculate repo start payment based on bond face value and dirty price.
+
+        Parameters
+        ----------
+        bond_face_value: float
+            A float which specifies the face value of bond.
+        dirty_price_perc: float
+            A float which specifies the dirty price (in percent) of bond.
+       
+        Returns
+        -------
+        float
+            The start payment of repo.
+        
+        Examples
+        --------
+        >>> ncd = Bond.coupncd(settlement=date(2020,7,15), maturity=date(2030,5,15), frequency=2, basis=1)
+        >>> print(ncd)
+        2020-11-15
+        '''
+        return bond_face_value * dirty_price_perc * 0.01
+
+    @staticmethod
+    def get_end_payment(bond_face_value, dirty_price_perc, repo_rate_perc, repo_period, type="US"):
+        '''Calculate repo end payment based on bond face value, dirty price, repo rate, repo period. 
+        This function is not able to consider coupon payment during repo period.
+
+        Parameters
+        ----------
+        bond_face_value: float
+            A float which specifies the face value of bond.
+        dirty_price_perc: float
+            A float which specifies the dirty price (in percent) of bond.
+        repo_rate_perc: float
+            A float which specifies the repo interest rate (in percent).
+        repo_period: int
+            An int which indicates the repo period (in days). 
+        type: str
+            A string which specifies the money market of repo. It should be either 'US' or 'UK'.
+        
+        Returns
+        -------
+        float
+            The end payment of repo.
+        
+        Examples
+        --------
+        100.06
+        >>> ncd = Bond.coupncd(settlement=date(2020,7,15), maturity=date(2030,5,15), frequency=2, basis=1)
+        >>> print(ncd)
+        2020-11-15
+        '''
+        if type == 'US':
+            days_in_year = 360
+        else:
+            days_in_year = 365
+        start_payment = Repo.get_start_payment(bond_face_value, dirty_price_perc)
+        repo_interest = start_payment * repo_rate_perc * 0.01 * repo_period / days_in_year
+        end_payment = start_payment + repo_interest
+        return end_payment
     
     def purchase_pr_with_margin(self, margin_perc=None):
         if margin_perc is None:

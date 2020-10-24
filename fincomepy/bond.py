@@ -124,7 +124,7 @@ class Bond(FixedIncome):
             rate=self._perc_dict["coupon"], par=1, frequency=self._frequency, basis=self._basis)
         self._perc_dict["dirty_price"] = self._perc_dict["clean_price"] + self._perc_dict["accrint"]
         self.update_dict()
-        self._yld = yld   ## TO DO: check if yld can be put into perc_dict
+        self._yld = yld
         self._mac_duration = None
         self._mod_duration = None
         self._DV01 = None
@@ -163,7 +163,7 @@ class Bond(FixedIncome):
         '''
 
         coupon_interval = 12 / frequency
-        nperiod = math.ceil((Bond.diff_month(settlement, maturity))/coupon_interval)
+        nperiod = math.ceil((Bond.diff_month(settlement, maturity)) / coupon_interval)
         pcd = maturity - relativedelta(months=coupon_interval) * nperiod
         if maturity==Bond.last_day_in_month(maturity):
             return Bond.last_day_in_month(pcd)
@@ -202,7 +202,7 @@ class Bond(FixedIncome):
         '''
 
         coupon_interval = 12 / frequency
-        nperiod = math.ceil((Bond.diff_month(settlement, maturity))/coupon_interval)
+        nperiod = math.ceil((Bond.diff_month(settlement, maturity)) / coupon_interval)
         ncd = maturity - relativedelta(months=coupon_interval) * (nperiod - 1)
         if maturity==Bond.last_day_in_month(maturity):
             return Bond.last_day_in_month(ncd)

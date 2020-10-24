@@ -29,6 +29,17 @@ class Test(unittest.TestCase):
         self.assertTrue(abs(repo_test.start_payment() - 113702830.60) < 0.01)
         self.assertTrue(abs(repo_test.end_payment() - 113382413.14) < 0.01)
     
+    def test_start_end_payment(self):
+        repo_test = Repo(settlement=date(2020,7,16), maturity=date(2030,5,15), coupon_perc=0.625, 
+            price_perc=99.953125, frequency=2, basis=1, 
+            bond_face_value=100000000, repo_period=32, repo_rate_perc=0.145)
+        dirty_price = repo_test._perc_dict["dirty_price"]
+        start_payment = Repo.get_start_payment(bond_face_value=100000000, dirty_price_perc=dirty_price)
+        self.assertTrue(abs(start_payment - 100058423.91) < 0.01)
+        end_payment = Repo.get_end_payment(bond_face_value=100000000, dirty_price_perc=dirty_price, 
+            repo_period=32, repo_rate_perc=0.145, type='US')
+        self.assertTrue(abs(end_payment - 100071320.33) < 0.01)
+        
     def test_from_end_date(self):
         repo_test = Repo(settlement=date(2020,7,17), maturity=date(2028,10,22), coupon_perc= (1 + 5/8), 
             price_perc=113.321, frequency=2, basis=1, 
