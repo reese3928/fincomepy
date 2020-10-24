@@ -144,6 +144,7 @@ print(dirty_price)
 ```{python}
 yld = Bond.yld(settlement=date(2020,7,15), maturity=date(2030,5,15), rate=0.625,
    pr=100.015625, redemption=100, frequency=2, basis=1)
+print(yld)
 ```
 
 * Bond Macaulay duration, modified duration, DV01 and convexity
