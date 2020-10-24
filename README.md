@@ -220,8 +220,10 @@ repo_test.end_payment()
 The Repo purchase and end payment can also be obtained by providing only partial bond information.
 
 ```{python}
+# purchase payment
 start_payment = Repo.get_start_payment(bond_face_value=100000000, dirty_price_perc=100.06)
 print(start_payment)
+# end payment
 end_payment = Repo.get_end_payment(bond_face_value=100000000, dirty_price_perc=100.06,
    repo_period=32, repo_rate_perc=0.145, type='US')
 print(end_payment)

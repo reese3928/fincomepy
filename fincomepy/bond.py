@@ -74,7 +74,7 @@ class Bond(FixedIncome):
 
     def __init__(self, settlement, maturity, coupon_perc, price_perc, frequency, basis=1, redemption=100, yld=None):
         '''
-        Constructor for ZspreadZero.
+        Constructor for Bond.
 
         Parameters
         ----------
