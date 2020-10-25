@@ -1,4 +1,4 @@
-.PHONY: test clean install
+.PHONY: test clean install run push
 
 test: 
 	pytest
@@ -23,3 +23,11 @@ clean-test:
 
 install: clean 
 	python setup.py install
+
+run:
+	python app/main.py
+
+push:
+	git add .
+	git commit -m "updated makefile"
+	git push origin master
