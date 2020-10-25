@@ -2,7 +2,50 @@ import numpy as np
 from fincomepy.fixedincome import FixedIncome
 
 class CDS(FixedIncome):
+    '''
+    A class used to perform credit default swap (CDS) related calculations.
+
+    Attributes
+    ----------
+    _reg_dict : dict
+        A dictionary which contains the regular quantities. The keys of _reg_dict should be the
+        same as that of _perc_dict.
+    _perc_dict : dict
+        A dictionary which contains the quantities in percent. The keys of _perc_dict should be the
+        same as that of _reg_dict.
+    _maturity: np.array
+        A numpy array which contains the maturity of bonds (in years). 
+    _cds_spread: np.array
+        A numpy array which contains the CDS spread (in percent) of each year.
+
+    Methods
+    -------
+    cds_spread()
+        Calculate CDS spread.
+    '''
+
     def __init__(self, risk_free_perc, risky_perc, face_value_perc=100, rr_perc=50, maturity=None):
+        '''
+        Constructor for CDS.
+
+        Parameters
+        ----------
+        risk_free_perc: np.array
+            A numpy array which contains the risk free rates (in percent) of bond.
+        risky_perc: np.array
+            A numpy array which contains the risky rates (in percent) of bond.
+        face_value_perc: float
+            A float which contains the face value (in percent) of bond.
+        rr_perc: float
+            A float which contains the recovery rate when calculating CDS.
+        maturity: np.array, optional
+            A numpy array which contains the maturity of bonds (in years). 
+
+        Examples
+        --------
+        >>> cds_test = CDS(risk_free_perc=np.array([3.12]*10), risky_perc=np.array([3.72]*10), 
+            face_value_perc=100, rr_perc=40)
+        '''
         super().__init__()
         assert risk_free_perc.size == risky_perc.size
         assert rr_perc >= 0 and rr_perc <= 100
@@ -19,11 +62,48 @@ class CDS(FixedIncome):
     
     @classmethod
     def from_bond_spread(cls, risk_free_perc, spread_perc, face_value_perc=100, rr_perc=50, maturity=None):
+        '''
+        Constructor for CDS.
+
+        Parameters
+        ----------
+        risk_free_perc: np.array
+            A numpy array which contains the risk free rates (in percent) of bond.
+        spread_perc: np.array
+            A numpy array which contains the bond spread (in percent).
+        face_value_perc: float
+            A float which contains the face value (in percent) of bond.
+        rr_perc: float
+            A float which contains the recovery rate when calculating CDS.
+        maturity: np.array, optional
+            A numpy array which contains the maturity of bonds (in years). 
+
+        Examples
+        --------
+        >>> cds_test = CDS.from_bond_spread(risk_free_perc=np.array([3.12]*10), 
+            spread_perc=np.array([0.6]*10), face_value_perc=100, rr_perc=40)
+        '''
         assert risk_free_perc.size == spread_perc.size
         risky_perc = risk_free_perc + spread_perc
         return cls(risk_free_perc, risky_perc, face_value_perc, rr_perc, maturity)
     
     def cds_spread(self):
+        '''Calculate CDS spread.
+
+        Returns
+        -------
+        np.array
+            A numpy array which contains the CDS spread (in percent) of each year.
+
+        Examples
+        --------
+        >>> cds_test = CDS(risk_free_perc=np.array([3.12]*10), risky_perc=np.array([3.72]*10), 
+            face_value_perc=100, rr_perc=40)
+        >>> cds_test.cds_spread()
+        array([0.57848052, 0.57848052, 0.57848052, 0.57848052, 0.57848052,
+               0.57848052, 0.57848052, 0.57848052, 0.57848052, 0.57848052])
+        '''
+
         if self._cds_spread:
             return self._cds_spread
         df_risk_free = []
