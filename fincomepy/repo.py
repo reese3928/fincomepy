@@ -6,7 +6,7 @@ from fincomepy.bond import Bond
 
 class Repo(Bond):
     '''
-    A class used to perform bond related calculations.
+    A class used to perform repo related calculations.
 
     Attributes
     ----------
