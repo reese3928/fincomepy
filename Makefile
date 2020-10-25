@@ -29,5 +29,5 @@ run:
 
 push:
 	git add .
-	git commit -m "updated makefile"
+	git commit -m "$m"
 	git push origin master
