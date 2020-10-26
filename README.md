@@ -3,12 +3,12 @@ fincomepy
 
 A set of tools to perform fixed income securities related calculation in Python. Products covered:
 
-* Z-spread calculation from zero coupon bond
-* Z-spread calculation from par coupon bond
-* Bond price, yield and other related calculations
-* Repo start payment, end payment, and break even yield
-* Bond future's net basis and implied repo rate
-* CDS spread
+* [Z-spread calculation from zero coupon bond](#z-spread-calculation-from-zero-coupon-bond)
+* [Z-spread calculation from par coupon bond](#z-spread-calculation-from-par-coupon-bond)
+* [Bond price, yield and other related calculations](#bond-price-yield-and-other-related-calculations)
+* [Repo start payment, end payment, and break even yield](#repo-start-payment-end-payment-and-break-even-yield)
+* [Bond future's net basis and implied repo rate](#bond-futures-net-basis-and-implied-repo-rate)
+* [CDS spread](#cds-spread)
 
 Author
 ----------
