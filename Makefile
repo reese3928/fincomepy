@@ -25,7 +25,6 @@ install: clean
 	python setup.py install
 
 run:
-	export FLASK_APP=microblog.py
 	python app/main.py
 
 push:
