@@ -5,6 +5,27 @@
     <h1>The is a web interface of fincomepy</h1>
     <p class="lead">Use this interface to run and visualize fixed income related calculations.<br> You will like it!</p>
 </div>
+
+<form>
+    <label for="quantity">Quantity (between 1 and 5):</label>
+    <input type="number" id="quantity" name="quantity" min="1" max="5" data-decimals="2">
+</form> 
+
+<form method="POST" role="form" class="form-horizontal">
+    <div class="form-group">
+        <input type="number" class="form-control" name="number1" placeholder="Number1">
+    </div>
+
+    <div class="form-group">
+        <input type="number" class="form-control" name="number2" placeholder="Number2">
+    </div>
+    <input type="submit" class="btn btn-default" value="Submit"/>
+
+    <div class="form-group">
+        Result: <input type="number" name="result_dc" value="{{ res }}">
+
+    </div>
     
-   
+</form>
+
 {% endblock content%}
