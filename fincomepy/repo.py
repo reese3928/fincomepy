@@ -139,7 +139,6 @@ class Repo(Bond):
                 coupon_perc=0.625, price_perc=(99+30/32), frequency=2, basis=1, 
                 bond_face_value=100000000, repo_period=1, repo_rate_perc=0.145)
         '''
-
         FixedIncome.__init__(self)
         super().__init__(settlement, maturity, coupon_perc, price_perc, frequency, basis)
         self._repo_period = repo_period

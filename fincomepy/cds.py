@@ -23,7 +23,7 @@ class CDS(FixedIncome):
     cds_spread()
         Calculate CDS spread.
     '''
-
+    
     def __init__(self, risk_free_perc, risky_perc, face_value_perc=100, rr_perc=50, maturity=None):
         '''
         Constructor for CDS.
@@ -103,7 +103,6 @@ class CDS(FixedIncome):
         array([0.57848052, 0.57848052, 0.57848052, 0.57848052, 0.57848052,
                0.57848052, 0.57848052, 0.57848052, 0.57848052, 0.57848052])
         '''
-
         if self._cds_spread:
             return self._cds_spread
         df_risk_free = []

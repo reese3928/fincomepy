@@ -49,7 +49,6 @@ class ZspreadZero(FixedIncome):
         >>> coupon_cf = np.array([3.0, 3.0, 3.0, 3.0, 103.0])
         >>> zspr_test1 = ZspreadZero(zero_discrete, coupon_cf)  
         """
-
         super().__init__()
         self._perc_dict["zero_rates"] = zero_rates_perc
         self._perc_dict["CF"] = CF_perc
@@ -89,7 +88,6 @@ class ZspreadZero(FixedIncome):
         >>> zspr_test1.get_zspread()
         0.8071473072171145
         """
-
         sol = root(lambda x: self.total_CF_zspread(x, self._reg_dict["zero_rates"], self._reg_dict["CF"], 
                    self._maturity) - self._reg_dict["face_value"], [0.01], *args, **kwargs)
         zspread = sol.x[0]
@@ -120,7 +118,6 @@ class ZspreadZero(FixedIncome):
         >>> zspr_test1.get_zspread()
         >>> zspr_test1.plot_zspread()
         '''
-
         if maturity is None:
             maturity = self._maturity
         if zero_rates_perc is None:
@@ -192,7 +189,6 @@ class ZspreadPar(ZspreadZero):
         >>> par_rates = np.array([1.00, 1.50, 1.80, 2.05, 2.20])
         >>> zspr_test2 = ZspreadPar(par_rates, coupon_cf)
         '''
-
         FixedIncome.__init__(self)
         self._perc_dict["par_rates"] = par_rates_perc
         self._perc_dict["CF"] = CF_perc
@@ -236,7 +232,6 @@ class ZspreadPar(ZspreadZero):
         >>> zspr_test2.get_zspread()
         0.8071642537725563
         """
-
         # calculate discount factors
         discount_factor = []
         discount_factor.append(self._reg_dict["face_value"] / (self._reg_dict["face_value"] + self._reg_dict["par_rates"][0]))

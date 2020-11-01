@@ -1,10 +1,12 @@
 from flask import Flask, render_template, url_for, request 
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import date, datetime
 from fincomepy import *
 ## TO DO: change this fincomepy to local 
 ## TO DO: check if different product can be put into separate python files
+## TO DO: test the app on goole cloud
 
 app = Flask(__name__)
 
@@ -30,7 +32,8 @@ def analysis():
         # construct a bond object
         bond_obj = Bond(settlement=settlement, maturity=maturity, coupon_perc=coupon_perc, 
             price_perc=price_perc, frequency=frequency, basis=basis)
-        
+
+        # TO DO: make input on the left side, output on the right side
         res = bond_obj.mac_duration()
         return render_template('analysis.html', res=res)
     return render_template('analysis.html')

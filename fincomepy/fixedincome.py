@@ -19,7 +19,7 @@ class FixedIncome(object):
     update_dict()
         Update both _reg_dict and _perc_dict.
     '''
-
+    
     def __init__(self):
         self._reg_dict = {}
         self._perc_dict = {}

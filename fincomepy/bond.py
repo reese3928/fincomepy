@@ -109,7 +109,6 @@ class Bond(FixedIncome):
         >>> bond_test = Bond(settlement=date(2020,7,15), maturity=date(2030,5,15),
             coupon_perc=0.625, price_perc=100.015625, frequency=2, basis=1)
         '''
-        
         super().__init__()
         self._settlement = settlement
         self._maturity = maturity
@@ -161,7 +160,6 @@ class Bond(FixedIncome):
         >>> print(pcd) 
         2020-05-15
         '''
-
         coupon_interval = 12 / frequency
         nperiod = math.ceil((Bond.diff_month(settlement, maturity)) / coupon_interval)
         pcd = maturity - relativedelta(months=coupon_interval) * nperiod
@@ -200,7 +198,6 @@ class Bond(FixedIncome):
         >>> print(ncd)
         2020-11-15
         '''
-
         coupon_interval = 12 / frequency
         nperiod = math.ceil((Bond.diff_month(settlement, maturity)) / coupon_interval)
         ncd = maturity - relativedelta(months=coupon_interval) * (nperiod - 1)
@@ -246,7 +243,6 @@ class Bond(FixedIncome):
         >>> print(accrued_int)  
         0.10360054347826086
         '''
-
         if issue > first_interest:
             raise Exception('issue date cannot be later than first interest date.')
         if basis == 2:
@@ -320,7 +316,6 @@ class Bond(FixedIncome):
         >>> print(dirty_price)
         100.11968449222717
         '''
-
         pcd = Bond.couppcd(settlement, maturity, frequency, basis)
         ncd = Bond.coupncd(settlement, maturity, frequency, basis)
         first_period = (ncd - settlement).days / (ncd - pcd).days
@@ -378,7 +373,6 @@ class Bond(FixedIncome):
         >>> print(yld)
         0.62334818110842
         '''
-
         pcd = Bond.couppcd(settlement, maturity, frequency, basis)
         ncd = Bond.coupncd(settlement, maturity, frequency, basis)
         accrued_interest = Bond.accrint(issue=pcd, first_interest=ncd, settlement=settlement, rate=rate, par=1, frequency=frequency, basis=basis)
@@ -419,7 +413,6 @@ class Bond(FixedIncome):
         >>> bond_test.mac_duration()
         9.543778095004477
         '''
-
         if self._mac_duration:
             return self._mac_duration
         periods, CF_regular, DF = self._intermediate_values()
@@ -449,7 +442,6 @@ class Bond(FixedIncome):
         >>> bond_test.mod_duration()
         9.51412677103921
         '''
-
         if self._mod_duration:
             return self._mod_duration
         if self._yld is None:
@@ -485,7 +477,6 @@ class Bond(FixedIncome):
         >>> bond_test.DV01()
         9.525470040389195
         '''
-
         if self._DV01:
             return self._DV01
         if self._mod_duration is None:
@@ -508,7 +499,6 @@ class Bond(FixedIncome):
         >>> bond_test.convexity()
         97.06268930241025
         '''
-
         if self._convexity:
             return self._convexity
         periods, CF_regular, DF = self._intermediate_values()
@@ -544,7 +534,6 @@ class Bond(FixedIncome):
         >>> bond_test.price_change(yld_change_perc=0.1)
         -0.9476880833978572
         '''
-
         DV01 = self.DV01()
         convexity = self.convexity()
         yld_change_reg = yld_change_perc * 0.01
