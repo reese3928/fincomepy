@@ -21,6 +21,7 @@ def about():
 
 @app.route("/analysis", methods=['GET', 'POST'])
 def analysis():
+    res = pd.DataFrame(columns = ["Attributes1", "Workout1","Attributes2", "Workout2"])
     if request.method == 'POST':
         # get input
         settlement = datetime.strptime(request.form['settlement'], '%Y-%m-%d').date()
@@ -32,13 +33,31 @@ def analysis():
         # construct a bond object
         bond_obj = Bond(settlement=settlement, maturity=maturity, coupon_perc=coupon_perc, 
             price_perc=price_perc, frequency=frequency, basis=basis)
-
-        # TO DO: make input on the left side, output on the right side
-        res = bond_obj.mac_duration()
-        return render_template('analysis.html', res=res)
-    return render_template('analysis.html')
-
-
+        # create result data frame
+        attributes1 = pd.Series({
+            "Settlement Date": str(settlement),
+            "Maturity Date": str(maturity),
+            "Coupon": str(coupon_perc) + '%',
+            "Market Price": str(price_perc) + '%',
+            "Coupon Frequency": str(frequency),
+            "Basis": str(basis),
+            "":""
+        })
+        attributes2 = pd.Series({
+            "Accrued Interest": str(round(bond_obj._perc_dict["accrint"], 4)) + '%',
+            "Dirty Price": str(round(bond_obj._perc_dict["dirty_price"], 4)) + '%',
+            "Yield": str(round(Bond.yld(settlement, maturity, coupon_perc, price_perc, 100, frequency, basis), 4)) + '%',
+            "Macaulay Duration": str(round(bond_obj.mac_duration(), 3)),
+            "Modified Duration": str(round(bond_obj.mod_duration(), 3)),
+            "DV01": str(round(bond_obj.DV01(), 3)),
+            "Convexity": str(round(bond_obj.convexity(), 3))
+        })
+        attributes1 = attributes1.to_frame().reset_index()
+        attributes2 = attributes2.to_frame().reset_index()
+        res = pd.concat([attributes1, attributes2], axis=1)
+        res.columns = ["Attributes1", "Workout1", "Attributes2", "Workout2"]
+        render_template('analysis.html', res=res)
+    return render_template('analysis.html', res=res)
 
 if __name__ == '__main__':
     app.run(debug=True)
