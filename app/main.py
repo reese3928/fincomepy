@@ -22,6 +22,10 @@ def about():
 @app.route("/analysis", methods=['GET', 'POST'])
 def analysis():
     res = pd.DataFrame(columns = ["Attributes1", "Workout1","Attributes2", "Workout2"])
+    res["Attributes1"] = ["Settlement Date", "Maturity Date", "Coupon", "Market Price", "Coupon Frequency", "Basis", ""]
+    res["Workout1"] = ""
+    res["Attributes2"] = ["Accrued Interest", "Dirty Price", "Yield", "Macaulay Duration", "Modified Duration", "DV01", "Convexity"]
+    res["Workout2"] = ""
     if request.method == 'POST':
         # get input
         settlement = datetime.strptime(request.form['settlement'], '%Y-%m-%d').date()
