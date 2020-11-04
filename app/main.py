@@ -19,8 +19,12 @@ def home():
 def about():
     return render_template('about.html')
 
-@app.route("/analysis", methods=['GET', 'POST'])
+@app.route("/analysis")
 def analysis():
+    return render_template('analysis.html')
+
+@app.route("/bond", methods=['GET', 'POST'])
+def bond():
     res = pd.DataFrame(columns = ["Attributes1", "Workout1","Attributes2", "Workout2"])
     res["Attributes1"] = ["Settlement Date", "Maturity Date", "Coupon", "Market Price", "Coupon Frequency", "Basis", ""]
     res["Workout1"] = ""
@@ -60,8 +64,8 @@ def analysis():
         attributes2 = attributes2.to_frame().reset_index()
         res = pd.concat([attributes1, attributes2], axis=1)
         res.columns = ["Attributes1", "Workout1", "Attributes2", "Workout2"]
-        render_template('analysis.html', res=res)
-    return render_template('analysis.html', res=res)
+        render_template('bond.html', res=res)
+    return render_template('bond.html', res=res)
 
 if __name__ == '__main__':
     app.run(debug=True)
