@@ -1,0 +1,98 @@
+{% extends "layout.html" %}
+{% block content %}
+
+{% include 'includes/tabs.html' %}
+
+<div class="starter-template">
+    <h2>Repo</h2>
+</div>
+
+<form method="POST" role="form">
+    <div class="form-row">
+        <div class="form-group col">
+            <h5>Input</h5>
+            {% include 'includes/bond_info.html' %}
+            <!-- TO DO: add yield as an optional input-->
+            <!-- TO DO: add input validality check-->
+
+            <div class="form-group row">
+                <label for="face-value-input" class="col-4 col-form-label">Face Value</label>
+                <div class="input-group-append">
+                    <input class="form-control" type="number" min="0" step="1e-16" id="face-value-input" name="bond_face_value">
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="repo-rate-perc-input" class="col-4 col-form-label">Repo Rate</label>
+                <div class="input-group-append">
+                    <input class="form-control" type="number" step="1e-16" id="repo-rate-perc-input" name="repo_rate_perc">
+                    <span class="input-group-text" id="repo-rate-perc-input">%</span>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="repo-period-input" class="col-4 col-form-label">Repo Period</label>
+                <div class="input-group-append">
+                    <input class="form-control" type="number" min="1" step="1" id="repo-period-input" name="repo_period">
+                    <span class="input-group-text" id="repo-period-input">day(s)</span>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="type-input" class="col-4 col-form-label">Money Market</label>
+                <div class="input-group-append">
+                    <select class="form-control" id="type-input" name="type">
+                        <option selected>US</option>
+                        <option>UK</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="margin-perc-input" class="col-4 col-form-label">Margin</label>
+                <div class="input-group-append">
+                    <input class="form-control" type="number" min="1" max="100" step="1e-16" id="margin-perc-input" name="margin_perc">
+                    <span class="input-group-text" id="margin-perc-input">%</span>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="haircut-perc-input" class="col-4 col-form-label">Haircut</label>
+                <div class="input-group-append">
+                    <input class="form-control" type="number" min="1" max="100" step="1e-16" id="haircut-perc-input" name="haircut_perc">
+                    <span class="input-group-text" id="haircut-perc-input">%</span>
+                </div>
+            </div>
+
+            
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+
+        <div class="form-group col">
+            <h5>Output</h5>
+            <div class="form-group">
+                <table class="table table-striped table-bordered table-hover w-auto">
+                    <thead class="thead-light">
+                        <tr>
+                            <th style="text-align: left">Attributes</th>
+                            <th style="text-align: right">Workout</th>
+                            <th style="text-align: left">Attributes</th>
+                            <th style="text-align: right">Workout</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for _, row in res.iterrows() %}
+                        <tr>
+                            <td style="text-align: left">{{ row['Attributes1'] }}</td>
+                            <td style="text-align: right">{{ row['Workout1'] }}</td>
+                            <td style="text-align: left">{{ row['Attributes2'] }}</td>
+                            <td style="text-align: right">{{ row['Workout2'] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock content%}
