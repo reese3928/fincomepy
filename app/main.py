@@ -13,6 +13,24 @@ from fincomepy import *
 
 app = Flask(__name__)
 
+
+## TO DO: put this function into another file
+def get_bond_info():
+    settlement = datetime.strptime(request.form['settlement'], '%Y-%m-%d').date()
+    maturity = datetime.strptime(request.form['maturity'], '%Y-%m-%d').date()
+    coupon_perc = float(request.form['coupon_perc'])
+    price_perc = float(request.form['price_perc'])
+    frequency = int(request.form['frequency'])
+    basis = int(request.form['basis'])
+    return (settlement, maturity, coupon_perc, price_perc, frequency, basis)
+
+def get_repo_info():
+    repo_period = int(request.form['repo_period'])
+    repo_rate_perc = float(request.form['repo_rate_perc'])
+    type = request.form['type']
+    return (repo_period, repo_rate_perc, type)
+
+
 @app.route("/")
 @app.route("/home")
 def home():
@@ -35,12 +53,7 @@ def bond():
     res["Workout2"] = ""
     if request.method == 'POST':
         # get input
-        settlement = datetime.strptime(request.form['settlement'], '%Y-%m-%d').date()
-        maturity = datetime.strptime(request.form['maturity'], '%Y-%m-%d').date()
-        coupon_perc = float(request.form['coupon_perc'])
-        price_perc = float(request.form['price_perc'])
-        frequency = int(request.form['frequency'])
-        basis = int(request.form['basis'])
+        settlement, maturity, coupon_perc, price_perc, frequency, basis = get_bond_info()
         # construct a bond object
         bond_obj = Bond(settlement=settlement, maturity=maturity, coupon_perc=coupon_perc, 
             price_perc=price_perc, frequency=frequency, basis=basis)
@@ -70,7 +83,7 @@ def bond():
         render_template('bond.html', res=res)
     return render_template('bond.html', res=res)
 
-## TO DO: if haircut is set then block margin
+## TO DO: if haircut is set then block margin 
 @app.route("/repo", methods=['GET', 'POST'])
 def repo():
     res = pd.DataFrame(columns = ["Attributes1", "Workout1","Attributes2", "Workout2"])
@@ -80,17 +93,9 @@ def repo():
     res["Workout2"] = ""
     if request.method == 'POST':
         # get input
-        settlement = datetime.strptime(request.form['settlement'], '%Y-%m-%d').date()
-        maturity = datetime.strptime(request.form['maturity'], '%Y-%m-%d').date()
-        coupon_perc = float(request.form['coupon_perc'])
-        price_perc = float(request.form['price_perc'])
-        frequency = int(request.form['frequency'])
-        basis = int(request.form['basis'])
+        settlement, maturity, coupon_perc, price_perc, frequency, basis = get_bond_info()
         bond_face_value = float(request.form['bond_face_value'])
-        repo_period = int(request.form['repo_period'])
-        repo_rate_perc = float(request.form['repo_rate_perc'])
-        type = request.form['type']
-
+        repo_period, repo_rate_perc, type = get_repo_info()
         # construct a repo object
         repo_obj = Repo(settlement=settlement, maturity=maturity, coupon_perc=coupon_perc, 
             price_perc=price_perc, frequency=frequency, basis=basis,
@@ -121,6 +126,50 @@ def repo():
         res.columns = ["Attributes1", "Workout1", "Attributes2", "Workout2"]
         render_template('repo.html', res=res)
     return render_template('repo.html', res=res)
+
+
+@app.route("/bond_future", methods=['GET', 'POST'])
+def bond_future():
+    res = pd.DataFrame(columns = ["Attributes1", "Workout1","Attributes2", "Workout2"])
+    res["Attributes1"] = ["Settlement Date", "Maturity Date", "Coupon", "Market Price", "Coupon Frequency", "Basis", "Face Value"]
+    res["Workout1"] = ""
+    res["Attributes2"] = ["Repo Start Date", "Repo Period", "Repo End Date", "Money Market", "Purchase Price", "End Payment", "Break Even Yield"]
+    res["Workout2"] = ""
+    if request.method == 'POST':
+        # get input
+        settlement, maturity, coupon_perc, price_perc, frequency, basis = get_bond_info()
+        bond_face_value = float(request.form['bond_face_value'])
+        repo_period, repo_rate_perc, type = get_repo_info()
+        # construct a repo object
+        repo_obj = Repo(settlement=settlement, maturity=maturity, coupon_perc=coupon_perc, 
+            price_perc=price_perc, frequency=frequency, basis=basis,
+            bond_face_value=bond_face_value, repo_period=repo_period, 
+            repo_rate_perc=repo_rate_perc, type=type)
+        # create result data frame
+        attributes1 = pd.Series({
+            "Settlement Date": str(settlement),
+            "Maturity Date": str(maturity),
+            "Coupon": str(coupon_perc) + '%',
+            "Market Price": str(price_perc) + '%',
+            "Coupon Frequency": str(frequency),
+            "Basis": str(basis),
+            "Face Value": str(bond_face_value)
+        })
+        attributes2 = pd.Series({
+            "Repo Start Date": str(settlement),
+            "Repo Period": str(repo_period),
+            "Repo End Date": str(repo_obj._repo_end_date),
+            "Money Market": type,
+            "Purchase Price": str(round(repo_obj.start_payment(), 2)),
+            "End Payment": str(round(repo_obj.end_payment(), 2)),
+            "Break Even Yield": str(round(repo_obj.break_even_yld(), 4)),
+        })
+        attributes1 = attributes1.to_frame().reset_index()
+        attributes2 = attributes2.to_frame().reset_index()
+        res = pd.concat([attributes1, attributes2], axis=1)
+        res.columns = ["Attributes1", "Workout1", "Attributes2", "Workout2"]
+        render_template('bond_future.html', res=res)
+    return render_template('bond_future.html', res=res)
 
 if __name__ == '__main__':
     app.run(debug=True)

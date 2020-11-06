@@ -18,31 +18,8 @@
             <button type="submit" class="btn btn-primary">Submit</button>
         </div>
 
-        <div class="form-group col">
-            <h5>Output</h5>
-            <div class="form-group">
-                <table class="table table-striped table-bordered table-hover w-auto">
-                    <thead class="thead-light">
-                        <tr>
-                            <th style="text-align: left">Attributes</th>
-                            <th style="text-align: right">Workout</th>
-                            <th style="text-align: left">Attributes</th>
-                            <th style="text-align: right">Workout</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for _, row in res.iterrows() %}
-                        <tr>
-                            <td style="text-align: left">{{ row['Attributes1'] }}</td>
-                            <td style="text-align: right">{{ row['Workout1'] }}</td>
-                            <td style="text-align: left">{{ row['Attributes2'] }}</td>
-                            <td style="text-align: right">{{ row['Workout2'] }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        {% include 'includes/output_table.html' %}
+        
     </div>
 </form>
 {% endblock content%}

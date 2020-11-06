@@ -1,0 +1,25 @@
+<div class="form-group row">
+    <label for="repo-rate-perc-input" class="col-4 col-form-label">Repo Rate</label>
+    <div class="input-group-append">
+        <input class="form-control" type="number" step="1e-16" id="repo-rate-perc-input" name="repo_rate_perc">
+        <span class="input-group-text" id="repo-rate-perc-input">%</span>
+    </div>
+</div>
+
+<div class="form-group row">
+    <label for="repo-period-input" class="col-4 col-form-label">Repo Period</label>
+    <div class="input-group-append">
+        <input class="form-control" type="number" min="1" step="1" id="repo-period-input" name="repo_period">
+        <span class="input-group-text" id="repo-period-input">day(s)</span>
+    </div>
+</div>
+
+<div class="form-group row">
+    <label for="type-input" class="col-4 col-form-label">Money Market</label>
+    <div class="input-group-append">
+        <select class="form-control" id="type-input" name="type">
+            <option selected>US</option>
+            <option>UK</option>
+        </select>
+    </div>
+</div>

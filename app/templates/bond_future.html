@@ -4,7 +4,7 @@
 {% include 'includes/tabs.html' %}
 
 <div class="starter-template">
-    <h2>Repo</h2>
+    <h2>Bond Future</h2>
 </div>
 
 <form method="POST" role="form">
@@ -24,23 +24,6 @@
 
             {% include 'includes/repo_info.html' %}
 
-            <div class="form-group row">
-                <label for="margin-perc-input" class="col-4 col-form-label">Margin</label>
-                <div class="input-group-append">
-                    <input class="form-control" type="number" min="1" max="100" step="1e-16" id="margin-perc-input" name="margin_perc">
-                    <span class="input-group-text" id="margin-perc-input">%</span>
-                </div>
-            </div>
-
-            <div class="form-group row">
-                <label for="haircut-perc-input" class="col-4 col-form-label">Haircut</label>
-                <div class="input-group-append">
-                    <input class="form-control" type="number" min="1" max="100" step="1e-16" id="haircut-perc-input" name="haircut_perc">
-                    <span class="input-group-text" id="haircut-perc-input">%</span>
-                </div>
-            </div>
-
-            
             <button type="submit" class="btn btn-primary">Submit</button>
         </div>
 
