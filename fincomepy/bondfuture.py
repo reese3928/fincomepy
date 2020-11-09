@@ -144,9 +144,10 @@ class BondFuture(Bond):
         self._conversion_factor = conversion_factor
         self._type = type   
         self.update_dict()
+        self._invoice_pr_perc = self._perc_dict["futures_pr_perc"] * self._conversion_factor
         self._forward_pr_perc = None
         self._future_val_perc = None
-    
+        
     @classmethod
     def from_end_date(cls, settlement, maturity, coupon_perc, price_perc, frequency, basis, 
         repo_end_date, repo_rate_perc, futures_pr_perc, conversion_factor, type='US'):
@@ -245,7 +246,6 @@ class BondFuture(Bond):
             days_in_year = 360
         else:
             days_in_year = 365
-        invoice_pr_perc = self._perc_dict["futures_pr_perc"] * self._conversion_factor
         temp = list(self.coupon_dates())
         temp.reverse()
         ind = bisect.bisect_left(temp, self._repo_end_date)
@@ -263,7 +263,7 @@ class BondFuture(Bond):
             ncd = Bond.coupncd(self._repo_end_date, self._maturity, self._frequency, self._basis)
             accrint_perc = Bond.accrint(coupon_dates[-1], ncd, self._repo_end_date, self._perc_dict["coupon"], 
                 1, self._frequency, self._basis)
-        self._future_val_perc = invoice_pr_perc + accrint_perc + coupon_FV
+        self._future_val_perc = self._invoice_pr_perc + accrint_perc + coupon_FV
         return self._future_val_perc
 
     def net_basis(self):

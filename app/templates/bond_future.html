@@ -14,15 +14,23 @@
             {% include 'includes/bond_info.html' %}
             <!-- TO DO: add yield as an optional input-->
             <!-- TO DO: add input validality check-->
+            {% include 'includes/repo_info.html' %}
 
             <div class="form-group row">
-                <label for="face-value-input" class="col-4 col-form-label">Face Value</label>
+                <label for="futures-pr-input" class="col-4 col-form-label">Futures Price</label>
                 <div class="input-group-append">
-                    <input class="form-control" type="number" min="0" step="1e-16" id="face-value-input" name="bond_face_value">
+                    <input class="form-control" type="number" min="0" step="1e-16" id="futures-pr-input" name="futures_pr_perc">
+                    <span class="input-group-text" id="futures-pr-input">%</span>
                 </div>
             </div>
 
-            {% include 'includes/repo_info.html' %}
+            <div class="form-group row">
+                <label for="conversion-factor-input" class="col-4 col-form-label">Conversion Factor</label>
+                <div class="input-group-append">
+                    <input class="form-control" type="number" min="0" step="1e-16" id="conversion-factor-input" name="conversion_factor">
+                    <span class="input-group-text" id="conversion-factor-input">%</span>
+                </div>
+            </div>
 
             <button type="submit" class="btn btn-primary">Submit</button>
         </div>

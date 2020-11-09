@@ -14,7 +14,7 @@ from fincomepy import *
 app = Flask(__name__)
 
 
-## TO DO: put this function into another file
+## TO DO: put these helper functions into another file
 def get_bond_info():
     settlement = datetime.strptime(request.form['settlement'], '%Y-%m-%d').date()
     maturity = datetime.strptime(request.form['maturity'], '%Y-%m-%d').date()
@@ -30,6 +30,22 @@ def get_repo_info():
     type = request.form['type']
     return (repo_period, repo_rate_perc, type)
 
+def get_bond_series(settlement, maturity, coupon_perc, price_perc, frequency, basis):
+    return pd.Series({
+        "Settlement Date": str(settlement),
+        "Maturity Date": str(maturity),
+        "Coupon": str(coupon_perc) + '%',
+        "Market Price": str(price_perc) + '%',
+        "Coupon Frequency": str(frequency),
+        "Basis": str(basis),
+    })
+
+def process_df(attributes1, attributes2):
+    df1 = attributes1.to_frame().reset_index()
+    df2 = attributes2.to_frame().reset_index()
+    res = pd.concat([df1, df2], axis=1)
+    res.columns = ["Attributes1", "Workout1", "Attributes2", "Workout2"]
+    return res
 
 @app.route("/")
 @app.route("/home")
@@ -58,15 +74,8 @@ def bond():
         bond_obj = Bond(settlement=settlement, maturity=maturity, coupon_perc=coupon_perc, 
             price_perc=price_perc, frequency=frequency, basis=basis)
         # create result data frame
-        attributes1 = pd.Series({
-            "Settlement Date": str(settlement),
-            "Maturity Date": str(maturity),
-            "Coupon": str(coupon_perc) + '%',
-            "Market Price": str(price_perc) + '%',
-            "Coupon Frequency": str(frequency),
-            "Basis": str(basis),
-            "":""
-        })
+        attributes1 = get_bond_series(settlement, maturity, coupon_perc, price_perc, frequency, basis)
+        attributes1[""] = ""
         attributes2 = pd.Series({
             "Accrued Interest": str(round(bond_obj._perc_dict["accrint"], 4)) + '%',
             "Dirty Price": str(round(bond_obj._perc_dict["dirty_price"], 4)) + '%',
@@ -76,12 +85,9 @@ def bond():
             "DV01": str(round(bond_obj.DV01(), 3)),
             "Convexity": str(round(bond_obj.convexity(), 3))
         })
-        attributes1 = attributes1.to_frame().reset_index()
-        attributes2 = attributes2.to_frame().reset_index()
-        res = pd.concat([attributes1, attributes2], axis=1)
-        res.columns = ["Attributes1", "Workout1", "Attributes2", "Workout2"]
-        render_template('bond.html', res=res)
-    return render_template('bond.html', res=res)
+        res = process_df(attributes1, attributes2)
+        render_template('bond.html', res=res, bf=False)
+    return render_template('bond.html', res=res, bf=False)
 
 ## TO DO: if haircut is set then block margin 
 @app.route("/repo", methods=['GET', 'POST'])
@@ -89,7 +95,7 @@ def repo():
     res = pd.DataFrame(columns = ["Attributes1", "Workout1","Attributes2", "Workout2"])
     res["Attributes1"] = ["Settlement Date", "Maturity Date", "Coupon", "Market Price", "Coupon Frequency", "Basis", "Face Value"]
     res["Workout1"] = ""
-    res["Attributes2"] = ["Repo Start Date", "Repo Period", "Repo End Date", "Money Market", "Purchase Price", "End Payment", "Break Even Yield"]
+    res["Attributes2"] = ["Repo Rate", "Repo Period", "Repo End Date", "Money Market", "Purchase Price", "End Payment", "Break Even Yield"]
     res["Workout2"] = ""
     if request.method == 'POST':
         # get input
@@ -102,17 +108,10 @@ def repo():
             bond_face_value=bond_face_value, repo_period=repo_period, 
             repo_rate_perc=repo_rate_perc, type=type)
         # create result data frame
-        attributes1 = pd.Series({
-            "Settlement Date": str(settlement),
-            "Maturity Date": str(maturity),
-            "Coupon": str(coupon_perc) + '%',
-            "Market Price": str(price_perc) + '%',
-            "Coupon Frequency": str(frequency),
-            "Basis": str(basis),
-            "Face Value": str(bond_face_value)
-        })
+        attributes1 = get_bond_series(settlement, maturity, coupon_perc, price_perc, frequency, basis)
+        attributes1["Face Value"] = str(bond_face_value)
         attributes2 = pd.Series({
-            "Repo Start Date": str(settlement),
+            "Repo Rate": str(repo_rate_perc) + '%',
             "Repo Period": str(repo_period),
             "Repo End Date": str(repo_obj._repo_end_date),
             "Money Market": type,
@@ -120,56 +119,59 @@ def repo():
             "End Payment": str(round(repo_obj.end_payment(), 2)),
             "Break Even Yield": str(round(repo_obj.break_even_yld(), 4)),
         })
-        attributes1 = attributes1.to_frame().reset_index()
-        attributes2 = attributes2.to_frame().reset_index()
-        res = pd.concat([attributes1, attributes2], axis=1)
-        res.columns = ["Attributes1", "Workout1", "Attributes2", "Workout2"]
-        render_template('repo.html', res=res)
-    return render_template('repo.html', res=res)
+        res = process_df(attributes1, attributes2)
+        render_template('repo.html', res=res, bf=False)
+    return render_template('repo.html', res=res, bf=False)
 
 
 @app.route("/bond_future", methods=['GET', 'POST'])
 def bond_future():
     res = pd.DataFrame(columns = ["Attributes1", "Workout1","Attributes2", "Workout2"])
-    res["Attributes1"] = ["Settlement Date", "Maturity Date", "Coupon", "Market Price", "Coupon Frequency", "Basis", "Face Value"]
+    res["Attributes1"] = ["Settlement Date", "Maturity Date", "Coupon", "Market Price", "Coupon Frequency", 
+        "Basis", "Repo Rate", "Repo Period", "Repo End Date", "Money Market", "Forward Price", ""]
     res["Workout1"] = ""
-    res["Attributes2"] = ["Repo Start Date", "Repo Period", "Repo End Date", "Money Market", "Purchase Price", "End Payment", "Break Even Yield"]
+    res["Attributes2"] = ["Last Delievery Date", "Maturity Date", "Previous Coupon Date", "Next Coupon Date", "Futures Price", 
+        "Conversion Factor", "Invoice Price", "Accrued at Delievery", "Full Futures Value", "Arbitrage PL", "Net Basis", "Implied Repo"]
     res["Workout2"] = ""
     if request.method == 'POST':
         # get input
         settlement, maturity, coupon_perc, price_perc, frequency, basis = get_bond_info()
-        bond_face_value = float(request.form['bond_face_value'])
         repo_period, repo_rate_perc, type = get_repo_info()
-        # construct a repo object
-        repo_obj = Repo(settlement=settlement, maturity=maturity, coupon_perc=coupon_perc, 
-            price_perc=price_perc, frequency=frequency, basis=basis,
-            bond_face_value=bond_face_value, repo_period=repo_period, 
-            repo_rate_perc=repo_rate_perc, type=type)
+        futures_pr_perc = float(request.form['futures_pr_perc'])
+        conversion_factor = float(request.form['conversion_factor'])
+        # construct a bond future object
+        bf_obj = BondFuture(settlement=settlement, maturity=maturity, coupon_perc=coupon_perc, 
+            price_perc=price_perc, frequency=frequency, basis=basis, repo_period=repo_period, 
+            repo_rate_perc=repo_rate_perc, futures_pr_perc=futures_pr_perc,
+            conversion_factor=conversion_factor, type=type)
         # create result data frame
-        attributes1 = pd.Series({
-            "Settlement Date": str(settlement),
-            "Maturity Date": str(maturity),
-            "Coupon": str(coupon_perc) + '%',
-            "Market Price": str(price_perc) + '%',
-            "Coupon Frequency": str(frequency),
-            "Basis": str(basis),
-            "Face Value": str(bond_face_value)
-        })
+        attributes1 = get_bond_series(settlement, maturity, coupon_perc, price_perc, frequency, basis)
+        attributes1["Repo Rate"] = str(repo_period)
+        attributes1["Repo Period"] = str(repo_period)
+        attributes1["Repo End Date"] = str(bf_obj._repo_end_date)
+        attributes1["Money Market"] = type
+        attributes1["Forward Price"] = str(round(bf_obj.forward_price(), 4)) 
+        attributes1[""] = ""
+        # calculate accrued interest
+        accrint_perc = Bond.accrint(bf_obj._couppcd, bf_obj._coupncd, bf_obj._repo_end_date, 
+                bf_obj._perc_dict["coupon"], 1, frequency, basis)
         attributes2 = pd.Series({
-            "Repo Start Date": str(settlement),
-            "Repo Period": str(repo_period),
-            "Repo End Date": str(repo_obj._repo_end_date),
-            "Money Market": type,
-            "Purchase Price": str(round(repo_obj.start_payment(), 2)),
-            "End Payment": str(round(repo_obj.end_payment(), 2)),
-            "Break Even Yield": str(round(repo_obj.break_even_yld(), 4)),
+            "Last Delievery Date": str(bf_obj._repo_end_date),
+            "Maturity Date": str(maturity), 
+            "Previous Coupon Date": str(bf_obj._couppcd), 
+            "Next Coupon Date": str(bf_obj._coupncd), 
+            "Futures Price": str(futures_pr_perc) + '%', 
+            "Conversion Factor": str(conversion_factor), 
+            "Invoice Price": str(round(bf_obj._invoice_pr_perc, 4)) + '%', 
+            "Accrued at Delievery": str(round(accrint_perc, 4)) + '%', 
+            "Full Futures Value": str(round(bf_obj.full_future_val(), 4)) + '%', 
+            "Arbitrage PL": str(round(bf_obj.full_future_val() - bf_obj.forward_price(), 4)) + '%', 
+            "Net Basis": str(round(bf_obj.net_basis(), 4)), 
+            "Implied Repo": str(round(bf_obj.implied_repo_rate(), 4)) + '%'
         })
-        attributes1 = attributes1.to_frame().reset_index()
-        attributes2 = attributes2.to_frame().reset_index()
-        res = pd.concat([attributes1, attributes2], axis=1)
-        res.columns = ["Attributes1", "Workout1", "Attributes2", "Workout2"]
-        render_template('bond_future.html', res=res)
-    return render_template('bond_future.html', res=res)
+        res = process_df(attributes1, attributes2)
+        render_template('bond_future.html', res=res, bf=True)
+    return render_template('bond_future.html', res=res, bf=True)
 
 if __name__ == '__main__':
     app.run(debug=True)

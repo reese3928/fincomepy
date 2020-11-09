@@ -4,9 +4,17 @@
         <table class="table table-striped table-bordered table-hover w-auto">
             <thead class="thead-light">
                 <tr>
-                    <th style="text-align: left">Attributes</th>
+                    {% if bf %}
+                        <th style="text-align: left">Cash Market</th>
+                    {% else %}
+                        <th style="text-align: left">Attributes</th>
+                    {% endif %}
                     <th style="text-align: right">Workout</th>
-                    <th style="text-align: left">Attributes</th>
+                    {% if bf %}
+                        <th style="text-align: left">Futures Market</th>
+                    {% else %}
+                        <th style="text-align: left">Attributes</th>
+                    {% endif %}
                     <th style="text-align: right">Workout</th>
                 </tr>
             </thead>
