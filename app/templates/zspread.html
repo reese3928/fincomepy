@@ -1,0 +1,74 @@
+{% extends "layout.html" %}
+{% block content %}
+
+{% include 'includes/tabs.html' %}
+
+<div class="starter-template">
+    <h2></h2>
+</div>
+
+<form method="POST" role="form">
+    <div class="form-row">
+        <div class="form-group col">
+            <h5>Z-spread from zero coupon bond</h5>
+            <div class="form-row">
+                <div class="form-group col-4">
+                    <label for="zero-coupon-input">Upload zero coupon rates and coupon cash flow</label>
+                </div>
+                <div class="form-group col-6">
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input" id="zero-coupon-input">
+                        <label class="custom-file-label" for="zero-coupon-input">Choose file</label>
+                      </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-4">
+                    <label for="face-value-perc-zero-input">Face Value</label>
+                </div>
+                <div class="form-group col-6">
+                    <div class="input-group-append">
+                        <input class="form-control" type="number" min="0" step="1e-16" id="face-value-perc-zero-input"
+                            name="face_value_perc_zero">
+                        <span class="input-group-text" id="face-value-perc-zero-input">%</span>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+
+        <div class="form-group col">
+            <h5>Z-spread from par coupon bond</h5>
+            <div class="form-row">
+                <div class="form-group col-4">
+                    <label for="par-coupon-input">Upload par coupon rates and coupon cash flow</label>
+                </div>
+                <div class="form-group col-6">
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input" id="par-coupon-input">
+                        <label class="custom-file-label" for="par-coupon-input">Choose file</label>
+                      </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-4">
+                    <label for="face-value-perc-par-input">Face Value</label>
+                </div>
+                <div class="form-group col-6">
+                    <div class="input-group-append">
+                        <input class="form-control" type="number" min="0" step="1e-16" id="face-value-perc-par-input"
+                            name="face_value_perc_par">
+                        <span class="input-group-text" id="face-value-perc-par-input">%</span>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+        
+    </div>
+</form>
+{% endblock content%}

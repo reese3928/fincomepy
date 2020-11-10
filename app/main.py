@@ -10,6 +10,7 @@ from fincomepy import *
 ## TO DO: test the package on windows (check if makefile, config still works)
 ## TO DO: add download to result table and figure
 ## TO DO: put bond.html, repo.html ... to products folder
+## TO DO: add instruction for the input excel file in zero coupon spread
 
 app = Flask(__name__)
 
@@ -172,6 +173,36 @@ def bond_future():
         res = process_df(attributes1, attributes2)
         render_template('bond_future.html', res=res, bf=True)
     return render_template('bond_future.html', res=res, bf=True)
+
+
+@app.route("/zspread")
+def zspread():
+    res = pd.DataFrame(columns = ["Attributes1", "Workout1","Attributes2", "Workout2"])
+    res["Attributes1"] = ["Settlement Date", "Maturity Date", "Coupon", "Market Price", "Coupon Frequency", "Basis", ""]
+    res["Workout1"] = ""
+    res["Attributes2"] = ["Accrued Interest", "Dirty Price", "Yield", "Macaulay Duration", "Modified Duration", "DV01", "Convexity"]
+    res["Workout2"] = ""
+    if request.method == 'POST':
+        # get input
+        settlement, maturity, coupon_perc, price_perc, frequency, basis = get_bond_info()
+        # construct a bond object
+        bond_obj = Bond(settlement=settlement, maturity=maturity, coupon_perc=coupon_perc, 
+            price_perc=price_perc, frequency=frequency, basis=basis)
+        # create result data frame
+        attributes1 = get_bond_series(settlement, maturity, coupon_perc, price_perc, frequency, basis)
+        attributes1[""] = ""
+        attributes2 = pd.Series({
+            "Accrued Interest": str(round(bond_obj._perc_dict["accrint"], 4)) + '%',
+            "Dirty Price": str(round(bond_obj._perc_dict["dirty_price"], 4)) + '%',
+            "Yield": str(round(Bond.yld(settlement, maturity, coupon_perc, price_perc, 100, frequency, basis), 4)) + '%',
+            "Macaulay Duration": str(round(bond_obj.mac_duration(), 3)),
+            "Modified Duration": str(round(bond_obj.mod_duration(), 3)),
+            "DV01": str(round(bond_obj.DV01(), 3)),
+            "Convexity": str(round(bond_obj.convexity(), 3))
+        })
+        res = process_df(attributes1, attributes2)
+        render_template('zspread.html', res=res, bf=False)
+    return render_template('zspread.html', res=res, bf=False)
 
 if __name__ == '__main__':
     app.run(debug=True)
