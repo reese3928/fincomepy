@@ -163,7 +163,7 @@ class Bond(FixedIncome):
         coupon_interval = 12 / frequency
         nperiod = math.ceil((Bond.diff_month(settlement, maturity)) / coupon_interval)
         pcd = maturity - relativedelta(months=coupon_interval) * nperiod
-        if maturity==Bond.last_day_in_month(maturity):
+        if maturity == Bond.last_day_in_month(maturity):
             return Bond.last_day_in_month(pcd)
         return pcd
     
@@ -201,7 +201,7 @@ class Bond(FixedIncome):
         coupon_interval = 12 / frequency
         nperiod = math.ceil((Bond.diff_month(settlement, maturity)) / coupon_interval)
         ncd = maturity - relativedelta(months=coupon_interval) * (nperiod - 1)
-        if maturity==Bond.last_day_in_month(maturity):
+        if maturity == Bond.last_day_in_month(maturity):
             return Bond.last_day_in_month(ncd)
         return ncd
     
@@ -390,7 +390,7 @@ class Bond(FixedIncome):
         periods = np.array([first_period + i for i in range(nperiod)])
         CF_perc = np.array([self._perc_dict["coupon"] / self._frequency] * nperiod)
         CF_perc[-1] += self._redemption
-        CF_regular = CF_perc*0.01
+        CF_regular = CF_perc * 0.01
         if self._yld is None:
             self._yld = self.yld(self._settlement, self._maturity, self._perc_dict["coupon"], self._perc_dict["clean_price"],
                                  self._redemption, self._frequency, self._basis)
@@ -444,7 +444,7 @@ class Bond(FixedIncome):
         '''
         if self._mod_duration:
             return self._mod_duration
-        if self._yld is None:
+        if not self._yld:
             original_yield_perc = self.yld(self._settlement, self._maturity, self._perc_dict["coupon"], self._perc_dict["clean_price"],
                                            self._redemption, self._frequency, self._basis)
         else:
@@ -506,7 +506,7 @@ class Bond(FixedIncome):
         CF_PV_times_p = CF_PV * periods
         CF_PV_times_p_2 = CF_PV * periods * periods
         all = (CF_PV_times_p + CF_PV_times_p_2) / self._reg_dict["dirty_price"]
-        if self._yld is None:
+        if not self._yld:
             self._yld = self.yld(self._settlement, self._maturity, self._perc_dict["coupon"], self._perc_dict["clean_price"],
                                  self._redemption, self._frequency, self._basis)
         yield_regular = self._yld * 0.01
@@ -603,7 +603,7 @@ class Bond(FixedIncome):
         coupon_interval = 12 / self._frequency
         periods = math.floor((self.diff_month(self._settlement, self._maturity)) / coupon_interval)
         coupon_dates = [self._maturity - relativedelta(months=coupon_interval) * i for i in range(periods + 1)]
-        if self._maturity==Bond.last_day_in_month(self._maturity):
+        if self._maturity == Bond.last_day_in_month(self._maturity):
             coupon_dates = [Bond.last_day_in_month(item) for item in coupon_dates]
         return coupon_dates
 

@@ -214,10 +214,7 @@ class BondFuture(Bond):
         >>> bf_test.forward_price()
         113.45529615319292
         '''
-        if self._type == 'US':
-            days_in_year = 360
-        else:
-            days_in_year = 365
+        days_in_year = 360 if self._type == 'US' else 365
         if self._forward_pr_perc:
             return self._forward_pr_perc
         forward_pr_reg = self._reg_dict["dirty_price"] *  (1 + self._reg_dict["repo_rate"] * self._repo_period / days_in_year)
@@ -242,16 +239,13 @@ class BondFuture(Bond):
         '''
         if self._future_val_perc:
             return self._future_val_perc
-        if self._type == 'US':
-            days_in_year = 360
-        else:
-            days_in_year = 365
+        days_in_year = 360 if self._type == 'US' else 365
         temp = list(self.coupon_dates())
         temp.reverse()
         ind = bisect.bisect_left(temp, self._repo_end_date)
         coupon_dates = temp[:ind]
         coupon_FV = 0.0 
-        if len(coupon_dates) == 0:
+        if not coupon_dates:
             accrint_perc = Bond.accrint(self._couppcd, self._coupncd, self._repo_end_date, 
                 self._perc_dict["coupon"], par=1, frequency=2, basis=1)
         else:
@@ -300,10 +294,7 @@ class BondFuture(Bond):
         >>> bf_test.implied_repo_rate()
         0.09462834553701782
         '''
-        if self._type == 'US':
-            days_in_year = 360
-        else:
-            days_in_year = 365
+        days_in_year = 360 if self._type == 'US' else 365
         implied_repo_reg = (self.full_future_val() / self._perc_dict["dirty_price"] - 1) * days_in_year / self._repo_period
         return implied_repo_reg * 100
 

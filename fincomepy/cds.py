@@ -53,7 +53,7 @@ class CDS(FixedIncome):
         self._perc_dict["risky"] = risky_perc
         self._perc_dict["face_value"] = face_value_perc
         self._perc_dict["rr"] = rr_perc
-        if maturity is None:
+        if not maturity:
             self._maturity = np.arange(self._perc_dict["risk_free"].size) + 1
         else:
             self._maturity = maturity

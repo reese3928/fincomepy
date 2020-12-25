@@ -233,10 +233,7 @@ class Repo(Bond):
         >>> repo_test.end_payment()
         100041503.48679988
         '''
-        if self._type == 'US':
-            days_in_year = 360
-        else:
-            days_in_year = 365
+        days_in_year = 360 if self._type == 'US' else 365
         if self._end_payment:
             return self._end_payment
         repo_interest = self._start_payment * self._reg_dict["repo_rate"] * self._repo_period / days_in_year
@@ -320,10 +317,7 @@ class Repo(Bond):
         >>> print(end_payment)
         100072896.62222221
         '''
-        if type == 'US':
-            days_in_year = 360
-        else:
-            days_in_year = 365
+        days_in_year = 360 if type == 'US' else 365
         start_payment = Repo.get_start_payment(bond_face_value, dirty_price_perc)
         repo_interest = start_payment * repo_rate_perc * 0.01 * repo_period / days_in_year
         end_payment = start_payment + repo_interest

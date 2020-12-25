@@ -53,7 +53,7 @@ class ZspreadZero(FixedIncome):
         self._perc_dict["zero_rates"] = zero_rates_perc
         self._perc_dict["CF"] = CF_perc
         self._perc_dict["face_value"] = face_value_perc
-        if maturity is None:
+        if not maturity:
             self._maturity = np.arange(self._perc_dict["zero_rates"].size) + 1
         else:
             self._maturity = maturity
@@ -118,11 +118,11 @@ class ZspreadZero(FixedIncome):
         >>> zspr_test1.get_zspread()
         >>> zspr_test1.plot_zspread()
         '''
-        if maturity is None:
+        if not maturity:
             maturity = self._maturity
-        if zero_rates_perc is None:
+        if not zero_rates_perc:
             zero_rates_perc = self._perc_dict["zero_rates"]
-        if zspread_perc is None:
+        if not zspread_perc:
             zspread_perc = self.zspread
         plt.plot(maturity, zero_rates_perc, label="Zero-Coupon Rates")
         plt.plot(maturity, zspread_perc + zero_rates_perc, label="Bond Pricing Rates")
@@ -196,7 +196,7 @@ class ZspreadPar(ZspreadZero):
         if compound not in ["discrete", "continuous"]:
             raise Exception(r"compound should be either 'discrete' or 'continuous' ")
         self._compound = compound
-        if maturity is None:
+        if not maturity:
             self._maturity = np.arange(self._perc_dict["par_rates"].size) + 1
         else:
             self._maturity = maturity

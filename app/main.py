@@ -3,7 +3,9 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import date, datetime
-from fincomepy import *
+from fincomepy import Bond, Repo, BondFuture, ZspreadPar, ZspreadZero
+from matplotlib.backends.backend_agg import FigureCanvasAgg
+from matplotlib.figure import Figure
 ## TO DO: change this fincomepy to local 
 ## TO DO: check if different product can be put into separate python files
 ## TO DO: test the app on goole cloud
@@ -11,6 +13,7 @@ from fincomepy import *
 ## TO DO: add download to result table and figure
 ## TO DO: put bond.html, repo.html ... to products folder
 ## TO DO: add instruction for the input excel file in zero coupon spread
+## TO DO: change from fincomepy import *    in readme
 
 app = Flask(__name__)
 
@@ -175,34 +178,32 @@ def bond_future():
     return render_template('bond_future.html', res=res, bf=True)
 
 
-@app.route("/zspread")
+@app.route("/zspread", methods=['GET', 'POST'])
 def zspread():
-    res = pd.DataFrame(columns = ["Attributes1", "Workout1","Attributes2", "Workout2"])
-    res["Attributes1"] = ["Settlement Date", "Maturity Date", "Coupon", "Market Price", "Coupon Frequency", "Basis", ""]
-    res["Workout1"] = ""
-    res["Attributes2"] = ["Accrued Interest", "Dirty Price", "Yield", "Macaulay Duration", "Modified Duration", "DV01", "Convexity"]
-    res["Workout2"] = ""
+    ## TO DO: handle file name issue (refer to flask official documentation)
+    res1 = 0.0
+    plt.figure()
+
     if request.method == 'POST':
-        # get input
-        settlement, maturity, coupon_perc, price_perc, frequency, basis = get_bond_info()
-        # construct a bond object
-        bond_obj = Bond(settlement=settlement, maturity=maturity, coupon_perc=coupon_perc, 
-            price_perc=price_perc, frequency=frequency, basis=basis)
-        # create result data frame
-        attributes1 = get_bond_series(settlement, maturity, coupon_perc, price_perc, frequency, basis)
-        attributes1[""] = ""
-        attributes2 = pd.Series({
-            "Accrued Interest": str(round(bond_obj._perc_dict["accrint"], 4)) + '%',
-            "Dirty Price": str(round(bond_obj._perc_dict["dirty_price"], 4)) + '%',
-            "Yield": str(round(Bond.yld(settlement, maturity, coupon_perc, price_perc, 100, frequency, basis), 4)) + '%',
-            "Macaulay Duration": str(round(bond_obj.mac_duration(), 3)),
-            "Modified Duration": str(round(bond_obj.mod_duration(), 3)),
-            "DV01": str(round(bond_obj.DV01(), 3)),
-            "Convexity": str(round(bond_obj.convexity(), 3))
-        })
-        res = process_df(attributes1, attributes2)
-        render_template('zspread.html', res=res, bf=False)
-    return render_template('zspread.html', res=res, bf=False)
+        df = pd.read_csv(request.files['zero_coupon_df'])
+        zspr_obj1 = ZspreadZero(df.iloc[:,0].values, df.iloc[:,1].values) 
+        res1 = round(zspr_obj1.get_zspread(), 4)
+        zspr_obj1.plot_zspread()
+        render_template('zspread.html', res=res1, resplot=plt.show())
+
+        
+    return render_template('zspread.html', res=res1, resplot=plt.show())
+
+
+@app.route("/zspread.png")
+def plot_png(df, zsprd):
+    fig = Figure()
+    axis = fig.add_subplot(1, 1, 1)
+    maturity = np.arange(df.size) + 1
+    axis.plot(maturity, df.iloc[:,0].values, label="Zero-Coupon Rates")
+    output = io.BytesIO()
+    FigureCanvasAgg(fig).print_png(output)
+    return Response(output.getvalue(), mimetype="image/png")
 
 if __name__ == '__main__':
     app.run(debug=True)
