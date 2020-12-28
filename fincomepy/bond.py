@@ -249,7 +249,10 @@ class Bond(FixedIncome):
             return (settlement - issue).days / 360 * rate
         if basis == 3:
             return (settlement - issue).days / 365 * rate
-        total_days = Bond._day_count(issue, first_interest, basis)
+        if basis in [0, 4]:
+            total_days = 360 / frequency
+        else:
+            total_days = Bond._day_count(issue, first_interest, basis)
         accrued_days = Bond._day_count(issue, settlement, basis)
         accrued_interest = (rate / frequency) * (accrued_days / total_days)
         return accrued_interest * par
@@ -270,11 +273,12 @@ class Bond(FixedIncome):
                 D1 = 30
             return 360 * (Y2 - Y1) + 30 * (M2 - M1) + (D2 - D1)
         if basis == 4:
-            if date1.day == 31:
-                date1 = date1 - relativedelta(days=1)
-            if date2.day == 31:
-                date2 = date2 - relativedelta(days=1)
-            return 360 * (date2.year - date1.year) + 30 * (date2.month - date1.month) + (date2.day - date1.day)
+            D1, D2 = date1.day, date2.day
+            if D1 == 31:
+                D1 = 30
+            if D2 == 31:
+                D2 = 30
+            return 360 * (date2.year - date1.year) + 30 * (date2.month - date1.month) + (D2 - D1)
         return (date2 - date1).days
 
     @staticmethod
@@ -318,9 +322,9 @@ class Bond(FixedIncome):
         '''
         pcd = Bond.couppcd(settlement, maturity, frequency, basis)
         ncd = Bond.coupncd(settlement, maturity, frequency, basis)
-        first_period = (ncd - settlement).days / (ncd - pcd).days
+        first_period = Bond._first_period(pcd, ncd, settlement, frequency, basis)
         coupon_interval = 12 / frequency  
-        nperiod = math.ceil((Bond.diff_month(settlement, maturity)) / coupon_interval)  
+        nperiod = math.ceil(Bond.diff_month(settlement, maturity) / coupon_interval)  
         periods = np.array([first_period + i for i in range(nperiod)])
         CF_perc = np.array([rate / frequency] * nperiod)
         CF_perc[-1] += redemption 
@@ -330,6 +334,26 @@ class Bond(FixedIncome):
         CF_PV = CF_regular * DF
         CF_PV_total = sum(CF_PV)
         return CF_PV_total * 100  
+
+    @staticmethod
+    def _first_period(pcd, ncd, settlement, frequency, basis):
+        if basis == 1:
+            denom_days = (ncd - pcd).days
+        elif basis in [0, 2, 4]:
+            denom_days = 360 / frequency
+        else:
+            denom_days = 365 / frequency
+        if basis in [1, 2, 3]:
+            num_days = (ncd - settlement).days
+        else:
+            Y1, M1, D1 = settlement.year, settlement.month, settlement.day
+            Y2, M2, D2 = ncd.year, ncd.month, ncd.day
+            if settlement == Bond.last_day_in_month(settlement):
+                D1 = 30
+            if ncd == Bond.last_day_in_month(ncd):
+                D2 = 30
+            num_days = 360 * (Y2 - Y1) + 30 * (M2 - M1) + (D2 - D1)
+        return num_days / denom_days
 
     @staticmethod
     def yld(settlement, maturity, rate, pr, redemption, frequency, basis, *args, **kwargs):
@@ -386,7 +410,7 @@ class Bond(FixedIncome):
     def _intermediate_values(self):
         coupon_interval = 12 / self._frequency  
         nperiod = math.ceil((Bond.diff_month(self._settlement, self._maturity))/coupon_interval) 
-        first_period = (self._coupncd - self._settlement).days / (self._coupncd - self._couppcd).days
+        first_period = Bond._first_period(self._couppcd, self._coupncd , self._settlement, self._frequency, self._basis)
         periods = np.array([first_period + i for i in range(nperiod)])
         CF_perc = np.array([self._perc_dict["coupon"] / self._frequency] * nperiod)
         CF_perc[-1] += self._redemption
