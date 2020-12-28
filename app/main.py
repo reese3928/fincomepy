@@ -179,31 +179,31 @@ def bond_future():
 
 
 @app.route("/zspread", methods=['GET', 'POST'])
-def zspread():
-    ## TO DO: handle file name issue (refer to flask official documentation)
-    res1 = 0.0
-    plt.figure()
+def zspread(): 
+    return render_template('zspread.html')
 
+
+@app.route("/zspread_zero", methods=['GET', 'POST'])
+def zspread_zero():
+    res1 = ""
     if request.method == 'POST':
         df = pd.read_csv(request.files['zero_coupon_df'])
         zspr_obj1 = ZspreadZero(df.iloc[:,0].values, df.iloc[:,1].values) 
-        res1 = round(zspr_obj1.get_zspread(), 4)
-        zspr_obj1.plot_zspread()
-        render_template('zspread.html', res=res1, resplot=plt.show())
-
-        
-    return render_template('zspread.html', res=res1, resplot=plt.show())
+        res1 = str(round(zspr_obj1.get_zspread(), 4))
+        render_template('zspread_zero.html', res=res1)      
+    return render_template('zspread_zero.html', res=res1)
 
 
-@app.route("/zspread.png")
-def plot_png(df, zsprd):
-    fig = Figure()
-    axis = fig.add_subplot(1, 1, 1)
-    maturity = np.arange(df.size) + 1
-    axis.plot(maturity, df.iloc[:,0].values, label="Zero-Coupon Rates")
-    output = io.BytesIO()
-    FigureCanvasAgg(fig).print_png(output)
-    return Response(output.getvalue(), mimetype="image/png")
+@app.route("/zspread_par", methods=['GET', 'POST'])
+def zspread_par():
+    res1 = ""
+    if request.method == 'POST':
+        df = pd.read_csv(request.files['par_coupon_df'])
+        zspr_obj1 = ZspreadPar(df.iloc[:,0].values, df.iloc[:,1].values) 
+        res1 = str(round(zspr_obj1.get_zspread(), 4))
+        render_template('zspread_par.html', res=res1)      
+    return render_template('zspread_par.html', res=res1)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
