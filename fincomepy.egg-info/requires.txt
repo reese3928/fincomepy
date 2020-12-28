@@ -1,6 +1,0 @@
-numpy
-datetime
-python-dateutil
-matplotlib
-scipy
-flask
