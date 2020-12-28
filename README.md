@@ -1,7 +1,9 @@
 fincomepy
 ==========
 
-A set of tools to perform fixed income securities related calculation in Python. Products covered:
+A set of tools to perform fixed income securities related calculation in Python. The Python module is accompanied by a Flask app with the same functionality. 
+
+Products covered:
 
 * [Z-spread calculation from zero coupon bond](#z-spread-calculation-from-zero-coupon-bond)
 * [Z-spread calculation from par coupon bond](#z-spread-calculation-from-par-coupon-bond)
@@ -25,6 +27,23 @@ or
 ```
 pip install .
 ```
+
+Flask App
+-------------
+To run the app, in the command line:
+```
+make run
+```
+or
+```
+python app/main.py
+```
+
+Then type
+```
+http://127.0.0.1:5000/
+```
+in the browser will bring you to the app.
 
 Usage
 ----------

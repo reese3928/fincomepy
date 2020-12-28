@@ -7,8 +7,6 @@ from helper import get_bond_info, get_repo_info, get_bond_series, process_df
 import sys
 sys.path.append('../fincomepy')
 from fincomepy import Bond, Repo, BondFuture, ZspreadPar, ZspreadZero, CDS
-## TO DO: test the app on goole cloud
-## TO DO: test the package on windows (check if makefile, config still works)
 ## TO DO: add download to result table and figure
 ## TO DO: add instruction for the input excel file in zero coupon spread
 ## TO DO: add instruction on how to run flask in readme
