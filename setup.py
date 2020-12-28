@@ -6,7 +6,7 @@ with open('README.md') as readme_file:
     readme = readme_file.read()
 
 requirements = ['numpy>=1.18.5', 'datetime', 'python-dateutil', 
-    'matplotlib']
+    'matplotlib>=3.0.3']
 
 setup_requirements = ['pytest-runner']
 
