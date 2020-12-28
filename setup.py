@@ -5,8 +5,8 @@ from setuptools import setup, find_packages
 with open('README.md') as readme_file:
     readme = readme_file.read()
 
-requirements = ['datetime', 'python-dateutil', 
-    'matplotlib>=3.0.3', 'flask>=1.1.2']
+requirements = ['numpy', 'datetime', 'python-dateutil', 
+    'matplotlib', 'scipy', 'flask']
 
 setup_requirements = ['pytest-runner']
 
