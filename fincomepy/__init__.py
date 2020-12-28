@@ -1,4 +1,4 @@
-"""Top-level package for fincomepy1."""
+"""Top-level package for fincomepy."""
 
 __author__ = """Xu Ren"""
 __email__ = 'xuren2120@gmail.com'

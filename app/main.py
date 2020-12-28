@@ -3,53 +3,17 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import date, datetime
+from helper import get_bond_info, get_repo_info, get_bond_series, process_df
+import sys
+sys.path.append('../fincomepy')
 from fincomepy import Bond, Repo, BondFuture, ZspreadPar, ZspreadZero, CDS
-from matplotlib.backends.backend_agg import FigureCanvasAgg
-from matplotlib.figure import Figure
-## TO DO: change this fincomepy to local 
-## TO DO: check if different product can be put into separate python files
 ## TO DO: test the app on goole cloud
 ## TO DO: test the package on windows (check if makefile, config still works)
 ## TO DO: add download to result table and figure
-## TO DO: put bond.html, repo.html ... to products folder
 ## TO DO: add instruction for the input excel file in zero coupon spread
-## TO DO: change from fincomepy import *    in readme
+## TO DO: add instruction on how to run flask in readme
 
 app = Flask(__name__)
-
-
-## TO DO: put these helper functions into another file
-def get_bond_info():
-    settlement = datetime.strptime(request.form['settlement'], '%Y-%m-%d').date()
-    maturity = datetime.strptime(request.form['maturity'], '%Y-%m-%d').date()
-    coupon_perc = float(request.form['coupon_perc'])
-    price_perc = float(request.form['price_perc'])
-    frequency = int(request.form['frequency'])
-    basis = int(request.form['basis'])
-    return (settlement, maturity, coupon_perc, price_perc, frequency, basis)
-
-def get_repo_info():
-    repo_period = int(request.form['repo_period'])
-    repo_rate_perc = float(request.form['repo_rate_perc'])
-    type = request.form['type']
-    return (repo_period, repo_rate_perc, type)
-
-def get_bond_series(settlement, maturity, coupon_perc, price_perc, frequency, basis):
-    return pd.Series({
-        "Settlement Date": str(settlement),
-        "Maturity Date": str(maturity),
-        "Coupon": str(coupon_perc) + '%',
-        "Market Price": str(price_perc) + '%',
-        "Coupon Frequency": str(frequency),
-        "Basis": str(basis),
-    })
-
-def process_df(attributes1, attributes2):
-    df1 = attributes1.to_frame().reset_index()
-    df2 = attributes2.to_frame().reset_index()
-    res = pd.concat([df1, df2], axis=1)
-    res.columns = ["Attributes1", "Workout1", "Attributes2", "Workout2"]
-    return res
 
 @app.route("/")
 @app.route("/home")

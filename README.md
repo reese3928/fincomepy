@@ -33,7 +33,7 @@ First import packages
 import numpy as np
 import matplotlib.pyplot as plt
 from datetime import date
-from fincomepy import *
+from fincomepy import Bond, Repo, BondFuture, ZspreadPar, ZspreadZero, CDS
 ```
 
 ### Z-spread calculation from zero coupon bond
