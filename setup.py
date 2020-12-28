@@ -6,7 +6,7 @@ with open('README.md') as readme_file:
     readme = readme_file.read()
 
 requirements = ['numpy', 'datetime', 'python-dateutil', 
-    'matplotlib', 'scipy', 'flask']
+    'matplotlib', 'scipy', 'flask', 'pytest']
 
 setup_requirements = ['pytest-runner']
 
