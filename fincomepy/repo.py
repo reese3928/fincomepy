@@ -345,7 +345,7 @@ class Repo(Bond):
         >>> repo_test.purchase_pr_with_margin(margin_perc=102)
         98079510.33674338
         '''
-        if margin_perc is None:
+        if not margin_perc:
             return self.start_payment()
         return self.start_payment() / margin_perc * 100
     
@@ -371,7 +371,7 @@ class Repo(Bond):
         >>> repo_test.purchase_pr_with_haircut(haircut_perc=2)
         98040278.53260869
         '''
-        if haircut_perc is None:
+        if not haircut_perc:
             return self.start_payment()
         return self.start_payment() * (1.0 - haircut_perc * 0.01)
         

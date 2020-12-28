@@ -40,7 +40,7 @@ class ZspreadZero(FixedIncome):
         face_value_perc : float
             The face value of bond (in percent).
         maturity : np.array, optional
-            A numpy array which contains he maturity of each zero-coupon bonds (in years).
+            A numpy array which contains the maturity of each zero-coupon bonds (in years).
             Default is None.
         
         Examples
@@ -53,7 +53,7 @@ class ZspreadZero(FixedIncome):
         self._perc_dict["zero_rates"] = zero_rates_perc
         self._perc_dict["CF"] = CF_perc
         self._perc_dict["face_value"] = face_value_perc
-        if not maturity:
+        if maturity is None:
             self._maturity = np.arange(self._perc_dict["zero_rates"].size) + 1
         else:
             self._maturity = maturity
@@ -103,7 +103,7 @@ class ZspreadZero(FixedIncome):
         Parameters
         ----------
         maturity : np.array, optional
-            A numpy array which contains he maturity of each zero-coupon bonds (in years).
+            A numpy array which contains the maturity of each zero-coupon bonds (in years).
             Default is None.
         zero_rates_perc : np.array, optional
             Zero-coupon rates (in percent). Default is None.
@@ -118,9 +118,9 @@ class ZspreadZero(FixedIncome):
         >>> zspr_test1.get_zspread()
         >>> zspr_test1.plot_zspread()
         '''
-        if not maturity:
+        if maturity is None:
             maturity = self._maturity
-        if not zero_rates_perc:
+        if zero_rates_perc is None:
             zero_rates_perc = self._perc_dict["zero_rates"]
         if not zspread_perc:
             zspread_perc = self.zspread
@@ -180,7 +180,7 @@ class ZspreadPar(ZspreadZero):
             A string that is either "discrete" or "continuous". It specifies whether discrete or continuous
             zero coupon rate will be used. Default is "discrete". 
         maturity : np.array, optional
-            A numpy array which contains he maturity of each zero-coupon bonds (in years).
+            A numpy array which contains the maturity of each zero-coupon bonds (in years).
             Default is None.
         
         Examples
@@ -196,7 +196,7 @@ class ZspreadPar(ZspreadZero):
         if compound not in ["discrete", "continuous"]:
             raise Exception(r"compound should be either 'discrete' or 'continuous' ")
         self._compound = compound
-        if not maturity:
+        if maturity is None:
             self._maturity = np.arange(self._perc_dict["par_rates"].size) + 1
         else:
             self._maturity = maturity

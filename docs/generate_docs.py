@@ -114,6 +114,7 @@ df = pd.DataFrame.from_dict({
     "Risk Free Rate": [3.12] * 10,
     "Risky Rate": [3.72] * 10
     })
+df.to_csv(os.path.join("docs", "cds_csv_input.csv"), index=False)
 df["Risk Free Rate"] = df["Risk Free Rate"].astype(str)
 df["Risk Free Rate"] += "%"
 df["Risky Rate"] = df["Risky Rate"].astype(str)

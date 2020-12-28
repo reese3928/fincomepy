@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import date, datetime
-from fincomepy import Bond, Repo, BondFuture, ZspreadPar, ZspreadZero
+from fincomepy import Bond, Repo, BondFuture, ZspreadPar, ZspreadZero, CDS
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 from matplotlib.figure import Figure
 ## TO DO: change this fincomepy to local 
@@ -183,12 +183,14 @@ def zspread():
     return render_template('zspread.html')
 
 
+## TO DO: future work, check if zspread_par.html and zspread_zero.html can be combined together
 @app.route("/zspread_zero", methods=['GET', 'POST'])
 def zspread_zero():
     res1 = ""
     if request.method == 'POST':
         df = pd.read_csv(request.files['zero_coupon_df'])
-        zspr_obj1 = ZspreadZero(df.iloc[:,0].values, df.iloc[:,1].values) 
+        face_value_perc = float(request.form['face_value_perc'])
+        zspr_obj1 = ZspreadZero(df.iloc[:,0].values, df.iloc[:,1].values, face_value_perc) 
         res1 = str(round(zspr_obj1.get_zspread(), 4))
         render_template('zspread_zero.html', res=res1)      
     return render_template('zspread_zero.html', res=res1)
@@ -199,10 +201,28 @@ def zspread_par():
     res1 = ""
     if request.method == 'POST':
         df = pd.read_csv(request.files['par_coupon_df'])
-        zspr_obj1 = ZspreadPar(df.iloc[:,0].values, df.iloc[:,1].values) 
+        face_value_perc = float(request.form['face_value_perc'])
+        zspr_obj1 = ZspreadPar(df.iloc[:,0].values, df.iloc[:,1].values, face_value_perc) 
         res1 = str(round(zspr_obj1.get_zspread(), 4))
         render_template('zspread_par.html', res=res1)      
     return render_template('zspread_par.html', res=res1)
+
+
+@app.route("/cds", methods=['GET', 'POST'])
+def cds():
+    res = pd.DataFrame(columns = ["Maturity", "CDS"])
+    if request.method == 'POST':
+        df = pd.read_csv(request.files['cds_input_df'])
+        face_value_perc = float(request.form['face_value_perc'])
+        rr_perc = float(request.form['rr_perc'])
+        cds_obj = CDS(df.iloc[:,1].values, df.iloc[:,2].values, face_value_perc, rr_perc, df.iloc[:,0].values)
+        cds_array = cds_obj.cds_spread()
+        res = pd.DataFrame.from_dict({
+            "Maturity": df.iloc[:,0].values,
+            "CDS": [str(round(item, 4)) + '%' for item in cds_array]
+        }) 
+        return render_template('cds.html', res=res)      
+    return render_template('cds.html', res=res)
 
 
 if __name__ == '__main__':
