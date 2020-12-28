@@ -22,7 +22,7 @@ clean-test:
 	rm -fr .pytest_cache
 
 install: clean 
-	python setup.py install
+	pip install .
 
 run:
 	python app/main.py

@@ -23,7 +23,7 @@ make install
 ```
 or
 ```
-python setup.py install
+pip install .
 ```
 
 Usage
