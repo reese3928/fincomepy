@@ -4,7 +4,7 @@
 {% include 'includes/tabs.html' %}
 
 <div class="starter-template">
-    <h2></h2>
+    <h2>Credit Default Swap Spread</h2>
 </div>
 
 <form method="POST" role="form" enctype="multipart/form-data">
@@ -15,7 +15,7 @@
 
             <div class="form-row">
                 <div class="form-group col-4">
-                    <label for="cds-input">Upload zero coupon rates and coupon cash flow</label>
+                    <label for="cds-input">Upload maturity, risk free rate, and risky rate</label>
                 </div>
                 <div class="form-group col-6">
                     <div class="custom-file">
@@ -41,6 +41,14 @@
             </div>
             
             <button type="submit" class="btn btn-primary">Submit</button>
+
+            <p>
+                The maturity, risk free rate, and risky rate should be in csv format with 1st column maturity, 
+                2nd column risk free rate, and 3rd column risky rate.
+            </p>
+
+            <img src="http://127.0.0.1:5000/app/templates/images/cds_input_example.png" alt="cds input example" style="width:42px;height:42px;">
+
         </div>
 
         <div class="form-group col">

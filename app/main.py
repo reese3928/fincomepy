@@ -7,9 +7,8 @@ from helper import get_bond_info, get_repo_info, get_bond_series, process_df
 import sys
 sys.path.append('../fincomepy')
 from fincomepy import Bond, Repo, BondFuture, ZspreadPar, ZspreadZero, CDS
-## TO DO: add download to result table and figure
+## TO DO: future work: add download to result table and figure
 ## TO DO: add instruction for the input excel file in zero coupon spread
-## TO DO: add a nice picture to the flask cover page
 
 app = Flask(__name__)
 
@@ -55,7 +54,6 @@ def bond():
         render_template('bond.html', res=res, bf=False)
     return render_template('bond.html', res=res, bf=False)
 
-## TO DO: if haircut is set then block margin 
 @app.route("/repo", methods=['GET', 'POST'])
 def repo():
     res = pd.DataFrame(columns = ["Attributes1", "Workout1","Attributes2", "Workout2"])
@@ -88,7 +86,6 @@ def repo():
         res = process_df(attributes1, attributes2)
         render_template('repo.html', res=res, bf=False)
     return render_template('repo.html', res=res, bf=False)
-
 
 @app.route("/bond_future", methods=['GET', 'POST'])
 def bond_future():
@@ -139,11 +136,9 @@ def bond_future():
         render_template('bond_future.html', res=res, bf=True)
     return render_template('bond_future.html', res=res, bf=True)
 
-
 @app.route("/zspread", methods=['GET', 'POST'])
 def zspread(): 
     return render_template('zspread.html')
-
 
 ## TO DO: future work, check if zspread_par.html and zspread_zero.html can be combined together
 @app.route("/zspread_zero", methods=['GET', 'POST'])
@@ -157,7 +152,6 @@ def zspread_zero():
         render_template('zspread_zero.html', res=res1)      
     return render_template('zspread_zero.html', res=res1)
 
-
 @app.route("/zspread_par", methods=['GET', 'POST'])
 def zspread_par():
     res1 = ""
@@ -168,7 +162,6 @@ def zspread_par():
         res1 = str(round(zspr_obj1.get_zspread(), 4))
         render_template('zspread_par.html', res=res1)      
     return render_template('zspread_par.html', res=res1)
-
 
 @app.route("/cds", methods=['GET', 'POST'])
 def cds():
