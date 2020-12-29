@@ -8,7 +8,6 @@ import sys
 sys.path.append('../fincomepy')
 from fincomepy import Bond, Repo, BondFuture, ZspreadPar, ZspreadZero, CDS
 ## TO DO: future work: add download to result table and figure
-## TO DO: add instruction for the input excel file in zero coupon spread
 
 app = Flask(__name__)
 
@@ -140,7 +139,6 @@ def bond_future():
 def zspread(): 
     return render_template('zspread.html')
 
-## TO DO: future work, check if zspread_par.html and zspread_zero.html can be combined together
 @app.route("/zspread_zero", methods=['GET', 'POST'])
 def zspread_zero():
     res1 = ""
@@ -149,8 +147,8 @@ def zspread_zero():
         face_value_perc = float(request.form['face_value_perc'])
         zspr_obj1 = ZspreadZero(df.iloc[:,0].values, df.iloc[:,1].values, face_value_perc) 
         res1 = str(round(zspr_obj1.get_zspread(), 4))
-        render_template('zspread_zero.html', res=res1)      
-    return render_template('zspread_zero.html', res=res1)
+        render_template('zspread.html', res=res1, type='zero')      
+    return render_template('zspread.html', res=res1, type='zero')
 
 @app.route("/zspread_par", methods=['GET', 'POST'])
 def zspread_par():
@@ -160,8 +158,8 @@ def zspread_par():
         face_value_perc = float(request.form['face_value_perc'])
         zspr_obj1 = ZspreadPar(df.iloc[:,0].values, df.iloc[:,1].values, face_value_perc) 
         res1 = str(round(zspr_obj1.get_zspread(), 4))
-        render_template('zspread_par.html', res=res1)      
-    return render_template('zspread_par.html', res=res1)
+        render_template('zspread.html', res=res1, type='par')      
+    return render_template('zspread.html', res=res1, type='par')
 
 @app.route("/cds", methods=['GET', 'POST'])
 def cds():

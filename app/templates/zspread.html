@@ -3,10 +3,47 @@
 
 {% include 'includes/tabs.html' %}
 
-{% include 'includes/zspread_tabs.html' %}
-
 <div class="starter-template">
-    <h2></h2>
+    <h2>Zspread from {{ type }} coupon bond</h2>
 </div>
 
+<form method="POST" role="form" enctype="multipart/form-data">
+    <div class="form-row">
+        <div class="form-group col">
+
+            <h5>Input</h5>
+
+            <div class="form-row">
+                <div class="form-group col-4">
+                    <label for="{{type}}-coupon-input">Upload {{ type }} coupon rates and coupon cash flow</label>
+                </div>
+                <div class="form-group col-6">
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input" id="{{type}}-coupon-input" name="{{type}}_coupon_df">
+                        <label class="custom-file-label" for="{{type}}-coupon-input">Choose file</label>
+                      </div>
+                </div>
+            </div>
+
+            {% include 'includes/fv_input.html' %}
+            
+            <button type="submit" class="btn btn-primary">Submit</button>
+
+            <p style="margin-bottom:1cm;"></p>
+            <p>
+                The {{ type }} coupon rates and coupon cash flow should be in csv format with 1st column {{ type }} coupon rates 
+                and 2nd column coupon cash flow.
+            </p>
+            <img src="https://github.com/reese3928/fincomepy/blob/master/app/templates/images/{{type}}_input_example.png?raw=true" 
+            alt="{{type}} coupon input example">
+            <p style="margin-bottom:1cm;"></p>
+            <p>
+                An example file can be found <a href="https://raw.githubusercontent.com/reese3928/fincomepy/master/docs/zspread_from_{{type}}.csv">here</a>.
+            </p>
+        </div>
+
+
+        {% include 'includes/zspread_output.html' %}
+    </div>
+</form>
 {% endblock content%}
