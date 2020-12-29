@@ -27,7 +27,7 @@ install: clean
 run:
 	python app/main.py
 
-push:
+push: clean 
 	git add .
 	git commit -m "$m"
 	git push origin master

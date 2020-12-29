@@ -9,7 +9,7 @@ sys.path.append('../fincomepy')
 from fincomepy import Bond, Repo, BondFuture, ZspreadPar, ZspreadZero, CDS
 ## TO DO: add download to result table and figure
 ## TO DO: add instruction for the input excel file in zero coupon spread
-## TO DO: add instruction on how to run flask in readme
+## TO DO: add a nice picture to the flask cover page
 
 app = Flask(__name__)
 

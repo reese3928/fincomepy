@@ -45,6 +45,8 @@ http://127.0.0.1:5000/
 ```
 in the browser will bring you to the app.
 
+![image](docs/flask_app.png)
+
 Usage
 ----------
 First import packages
