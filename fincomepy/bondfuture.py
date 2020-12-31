@@ -135,7 +135,6 @@ class BondFuture(Bond):
             price_perc=113.015625, frequency=2, basis=1, 
             repo_period=75, repo_rate_perc=0.14, futures_pr_perc=139.4375, conversion_factor=0.8072)
         '''
-        FixedIncome.__init__(self)
         super().__init__(settlement, maturity, coupon_perc, price_perc, frequency, basis)
         self._repo_period = repo_period
         self._perc_dict["repo_rate"] = repo_rate_perc
