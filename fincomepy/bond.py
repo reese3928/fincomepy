@@ -161,8 +161,11 @@ class Bond(FixedIncome):
         2020-05-15
         '''
         coupon_interval = 12 / frequency
-        nperiod = math.ceil((Bond.diff_month(settlement, maturity)) / coupon_interval)
-        pcd = maturity - relativedelta(months=coupon_interval) * nperiod
+        nperiod = math.floor(Bond.diff_month(settlement, maturity) / coupon_interval)
+        # settlement date is equal to coupon payment date
+        if settlement == maturity - relativedelta(months=coupon_interval) * nperiod:
+            return settlement
+        pcd = maturity - relativedelta(months=coupon_interval) * (nperiod + 1)
         if maturity == Bond.last_day_in_month(maturity):
             return Bond.last_day_in_month(pcd)
         return pcd
@@ -199,8 +202,11 @@ class Bond(FixedIncome):
         2020-11-15
         '''
         coupon_interval = 12 / frequency
-        nperiod = math.ceil((Bond.diff_month(settlement, maturity)) / coupon_interval)
-        ncd = maturity - relativedelta(months=coupon_interval) * (nperiod - 1)
+        nperiod = math.floor(Bond.diff_month(settlement, maturity) / coupon_interval)
+        # settlement date is equal to coupon payment date
+        if settlement == maturity - relativedelta(months=coupon_interval) * nperiod:
+            return maturity - relativedelta(months=coupon_interval) * (nperiod - 1)
+        ncd = maturity - relativedelta(months=coupon_interval) * nperiod
         if maturity == Bond.last_day_in_month(maturity):
             return Bond.last_day_in_month(ncd)
         return ncd
