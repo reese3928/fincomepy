@@ -161,11 +161,8 @@ class Bond(FixedIncome):
         2020-05-15
         '''
         coupon_interval = 12 / frequency
-        nperiod = math.floor(Bond.diff_month(settlement, maturity) / coupon_interval)
-        # settlement date is equal to coupon payment date
-        if settlement == maturity - relativedelta(months=coupon_interval) * nperiod:
-            return settlement
-        pcd = maturity - relativedelta(months=coupon_interval) * (nperiod + 1)
+        nperiod = Bond.get_nperiod(settlement, maturity, coupon_interval)
+        pcd = maturity - relativedelta(months=coupon_interval) * nperiod
         if maturity == Bond.last_day_in_month(maturity):
             return Bond.last_day_in_month(pcd)
         return pcd
@@ -202,11 +199,8 @@ class Bond(FixedIncome):
         2020-11-15
         '''
         coupon_interval = 12 / frequency
-        nperiod = math.floor(Bond.diff_month(settlement, maturity) / coupon_interval)
-        # settlement date is equal to coupon payment date
-        if settlement == maturity - relativedelta(months=coupon_interval) * nperiod:
-            return maturity - relativedelta(months=coupon_interval) * (nperiod - 1)
-        ncd = maturity - relativedelta(months=coupon_interval) * nperiod
+        nperiod = Bond.get_nperiod(settlement, maturity, coupon_interval)
+        ncd = maturity - relativedelta(months=coupon_interval) * (nperiod - 1)
         if maturity == Bond.last_day_in_month(maturity):
             return Bond.last_day_in_month(ncd)
         return ncd
@@ -330,7 +324,7 @@ class Bond(FixedIncome):
         ncd = Bond.coupncd(settlement, maturity, frequency, basis)
         first_period = Bond._first_period(pcd, ncd, settlement, frequency, basis)
         coupon_interval = 12 / frequency  
-        nperiod = math.ceil(Bond.diff_month(settlement, maturity) / coupon_interval)  
+        nperiod = Bond.get_nperiod(settlement, maturity, coupon_interval)  
         periods = np.array([first_period + i for i in range(nperiod)])
         CF_perc = np.array([rate / frequency] * nperiod)
         CF_perc[-1] += redemption 
@@ -415,7 +409,7 @@ class Bond(FixedIncome):
 
     def _intermediate_values(self):
         coupon_interval = 12 / self._frequency  
-        nperiod = math.ceil((Bond.diff_month(self._settlement, self._maturity))/coupon_interval) 
+        nperiod = Bond.get_nperiod(self._settlement, self._maturity, coupon_interval)
         first_period = Bond._first_period(self._couppcd, self._coupncd , self._settlement, self._frequency, self._basis)
         periods = np.array([first_period + i for i in range(nperiod)])
         CF_perc = np.array([self._perc_dict["coupon"] / self._frequency] * nperiod)
@@ -631,10 +625,18 @@ class Bond(FixedIncome):
             A list of coupon payment dates.
         '''
         coupon_interval = 12 / self._frequency
-        periods = math.floor((self.diff_month(self._settlement, self._maturity)) / coupon_interval)
-        coupon_dates = [self._maturity - relativedelta(months=coupon_interval) * i for i in range(periods + 1)]
+        periods = Bond.get_nperiod(self._settlement, self._maturity, coupon_interval)
+        coupon_dates = [self._maturity - relativedelta(months=coupon_interval) * i for i in range(periods)]
         if self._maturity == Bond.last_day_in_month(self._maturity):
             coupon_dates = [Bond.last_day_in_month(item) for item in coupon_dates]
         return coupon_dates
+
+    @staticmethod
+    def get_nperiod(settlement, maturity, coupon_interval):
+        assert settlement < maturity
+        nperiod = 0
+        while maturity - relativedelta(months=coupon_interval) * nperiod > settlement:
+            nperiod += 1
+        return nperiod
 
 

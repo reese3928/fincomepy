@@ -73,45 +73,68 @@ class Test(unittest.TestCase):
                                         rate=0.625, par=1, frequency=2, basis=1)
         self.assertAlmostEqual(accrued_interest, 0.1036, places=4)
 
-        pcd = Bond.couppcd(settlement=date(2020,8,10), maturity=date(2046,8,15), frequency=2, basis=1)
-        self.assertEqual(pcd, date(2020, 2, 15))
-        ncd = Bond.coupncd(settlement=date(2020,8,10), maturity=date(2046,8,15), frequency=2, basis=1)
-        self.assertEqual(ncd, date(2020, 8, 15))
+        bonds = [
+            {
+                "settlement": date(2020,8,10), "maturity": date(2046,8,15), "frequency": 2, "basis": 1,
+                "pcd": date(2020, 2, 15), "ncd": date(2020, 8, 15)
+            },
+            {
+                "settlement": date(2020,8,10), "maturity": date(2046,8,15), "frequency": 1, "basis": 1,
+                "pcd": date(2019, 8, 15), "ncd": date(2020, 8, 15)
+            },
+            {
+                "settlement": date(2020,8,15), "maturity": date(2046,8,15), "frequency": 2, "basis": 1,
+                "pcd": date(2020, 8, 15), "ncd": date(2021, 2, 15)
+            },
+            {
+                "settlement": date(2020,8,15), "maturity": date(2046,8,15), "frequency": 1, "basis": 1,
+                "pcd": date(2020, 8, 15), "ncd": date(2021, 8, 15)
+            },
+            {
+                "settlement": date(2020,8,15), "maturity": date(2046,8,31), "frequency": 2, "basis": 1,
+                "pcd": date(2020, 2, 29), "ncd": date(2020, 8, 31)
+            },
+            {
+                "settlement": date(2020,8,15), "maturity": date(2046,8,31), "frequency": 1, "basis": 1,
+                "pcd": date(2019, 8, 31), "ncd": date(2020, 8, 31)
+            },
+            {
+                "settlement": date(2020,8,31), "maturity": date(2046,8,31), "frequency": 2, "basis": 1,
+                "pcd": date(2020, 8, 31), "ncd": date(2021, 2, 28)
+            },
+            {
+                "settlement": date(2020,8,31), "maturity": date(2046,8,31), "frequency": 1, "basis": 1,
+                "pcd": date(2020, 8, 31), "ncd": date(2021, 8, 31)
+            },
+            {
+                "settlement": date(2020,8,17), "maturity": date(2050,8,15), "frequency": 2, "basis": 1,
+                "pcd": date(2020, 8, 15), "ncd": date(2021, 2, 15)
+            },
+            {
+                "settlement": date(2020,8,17), "maturity": date(2050,8,15), "frequency": 1, "basis": 1,
+                "pcd": date(2020, 8, 15), "ncd": date(2021, 8, 15)
+            },
+            {
+                "settlement": date(2050,8,14), "maturity": date(2050,8,15), "frequency": 2, "basis": 1,
+                "pcd": date(2050, 2, 15), "ncd": date(2050, 8, 15)
+            },
+            {
+                "settlement": date(2050,8,14), "maturity": date(2050,8,15), "frequency": 1, "basis": 1,
+                "pcd": date(2049, 8, 15), "ncd": date(2050, 8, 15)
+            }
+        ]
 
-        pcd = Bond.couppcd(settlement=date(2020,8,10), maturity=date(2046,8,15), frequency=1, basis=1)
-        self.assertEqual(pcd, date(2019, 8, 15))
-        ncd = Bond.coupncd(settlement=date(2020,8,10), maturity=date(2046,8,15), frequency=1, basis=1)
-        self.assertEqual(ncd, date(2020, 8, 15))
-
-        pcd = Bond.couppcd(settlement=date(2020,8,15), maturity=date(2046,8,15), frequency=2, basis=1)
-        self.assertEqual(pcd, date(2020, 8, 15))
-        ncd = Bond.coupncd(settlement=date(2020,8,15), maturity=date(2046,8,15), frequency=2, basis=1)
-        self.assertEqual(ncd, date(2021, 2, 15))
-
-        pcd = Bond.couppcd(settlement=date(2020,8,15), maturity=date(2046,8,15), frequency=1, basis=1)
-        self.assertEqual(pcd, date(2020, 8, 15))
-        ncd = Bond.coupncd(settlement=date(2020,8,15), maturity=date(2046,8,15), frequency=1, basis=1)
-        self.assertEqual(ncd, date(2021, 8, 15))
-
-        pcd = Bond.couppcd(settlement=date(2020,8,15), maturity=date(2046,8,31), frequency=2, basis=1)
-        self.assertEqual(pcd, date(2020, 2, 29))
-        ncd = Bond.coupncd(settlement=date(2020,8,15), maturity=date(2046,8,31), frequency=2, basis=1)
-        self.assertEqual(ncd, date(2020, 8, 31))
-
-        pcd = Bond.couppcd(settlement=date(2020,8,15), maturity=date(2046,8,31), frequency=1, basis=1)
-        self.assertEqual(pcd, date(2019, 8, 31))
-        ncd = Bond.coupncd(settlement=date(2020,8,15), maturity=date(2046,8,31), frequency=1, basis=1)
-        self.assertEqual(ncd, date(2020, 8, 31))
-
-        pcd = Bond.couppcd(settlement=date(2020,8,31), maturity=date(2046,8,31), frequency=2, basis=1)
-        self.assertEqual(pcd, date(2020, 8, 31))
-        ncd = Bond.coupncd(settlement=date(2020,8,31), maturity=date(2046,8,31), frequency=2, basis=1)
-        self.assertEqual(ncd, date(2021, 2, 28))
-
-        pcd = Bond.couppcd(settlement=date(2020,8,31), maturity=date(2046,8,31), frequency=1, basis=1)
-        self.assertEqual(pcd, date(2020, 8, 31))
-        ncd = Bond.coupncd(settlement=date(2020,8,31), maturity=date(2046,8,31), frequency=1, basis=1)
-        self.assertEqual(ncd, date(2021, 8, 31))
+        for bond in bonds:
+            pcd = Bond.couppcd(settlement=bond["settlement"], maturity=bond["maturity"], 
+                frequency=bond["frequency"], basis=bond["basis"])
+            self.assertEqual(pcd, bond["pcd"])
+            ncd = Bond.coupncd(settlement=bond["settlement"], maturity=bond["maturity"], 
+                frequency=bond["frequency"], basis=bond["basis"])
+            self.assertEqual(ncd, bond["ncd"])
+            bond_obj = Bond(settlement=bond["settlement"], maturity=bond["maturity"], coupon_perc=1.375, 
+                price_perc=99.8, frequency=bond["frequency"], basis=bond["basis"], redemption=100)
+            coupon_dts = bond_obj.coupon_dates()
+            self.assertEqual(bond["ncd"], coupon_dts[-1])
 
     def test_parse_price(self):
         bond_test1 = Bond(settlement=date(2020,7,15), maturity=date(2030,5,15), coupon_perc=0.625, 
